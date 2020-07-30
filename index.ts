@@ -28,13 +28,9 @@ exports.main = async (context) => {
  */
 // @ts-ignore
 exports.spm = async (context) => {
-    const app = new App(context, "spm");
-    let need = {type: ""}
-    return await app.run(async function () {
-        let spmService = new SpmService(context);
-        await spmService.add(this.type);
-        return BaseResult.success();
-    }, need);
+    let spmService = new SpmService(context);
+    await spmService.add(this.type);
+    return BaseResult.success();
 }
 // @ts-ignore
 exports.spmCount = async (context) => {
@@ -45,6 +41,10 @@ exports.disUser = async (context) => {
     return await gmtaobao.spm.disUser(context);
 };
 
+/**
+ * 配置
+ * @param context
+ */
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");

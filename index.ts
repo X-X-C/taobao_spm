@@ -22,10 +22,38 @@ exports.main = async (context) => {
         // do...
     });
 }
+
 /**
- * 统计
+ * 配置
  * @param context
  */
+// @ts-ignore
+exports.selectUiTitleAndType = async (context) => {
+    let data = {
+        "statisticsTitleAndTypeArr": [
+            {
+                "title": "总独立访问次数",
+                "type": "PV",
+                "parameter": {"type": "view"},
+                "fun": "spmCount"
+            },
+            {
+                "title": "总独立访客人数",
+                "type": "UV",
+                "parameter": {"type": "view"},
+                "fun": "disUser"
+            },
+            {
+                "title": "新增独立访客人数",
+                "type": "newUV",
+                "parameter": {"type": "view"},
+                "fun": "newUser"
+            }
+        ]
+    }
+    return BaseResult.success("成功", data);
+};
+
 // @ts-ignore
 exports.spm = async (context) => {
     let spmService = new SpmService(context);
@@ -40,31 +68,7 @@ exports.spmCount = async (context) => {
 exports.disUser = async (context) => {
     return await gmtaobao.spm.disUser(context);
 };
-
-/**
- * 配置
- * @param context
- */
 // @ts-ignore
-exports.selectUiTitleAndType = async (context) => {
-    const app = new App(context, "selectUiTitleAndType");
-    return await app.run(async function () {
-        let data = {
-            "statisticsTitleAndTypeArr": [
-                {
-                    "title": "总独立访问次数",
-                    "type": "PV",
-                    "parameter": {"type": "view"},
-                    "fun": "spmCount"
-                },
-                {
-                    "title": "总独立访客人数",
-                    "type": "UV",
-                    "parameter": {"type": "view"},
-                    "fun": "disUser"
-                }
-            ]
-        }
-        return BaseResult.success("成功", data);
-    });
+exports.newUser = async (context) => {
+    return await gmtaobao.spm.newUser(context);
 };

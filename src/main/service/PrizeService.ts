@@ -34,25 +34,22 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         let pipe: any = [
             {
                 $match: filter
-            },
-            {
-                $skip: (currentPage - 1) * size
-            },
-            {
-                $limit: size
             }
         ]
-        let project = {
-            _id: 0,
-            receiveStatus: {
-                $cond: {
-                    if: {
-                        $eq: ["$receiveStatus", true],
-                    },
-                    then: "是",
-                    else: "否"
+        //分页
+        if (currentPage && size) {
+            pipe.push(
+                {
+                    $skip: (currentPage - 1) * size
+                },
+                {
+                    $limit: size
                 }
-            }
+            );
+        }
+        //取字段
+        let project = {
+            _id: 0
         };
         //排除额外操作字段
         for (let key in config) {
@@ -71,7 +68,9 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
                 project[key] = v;
             }
         }
-        pipe.push(project);
+        pipe.push({
+            $project: project
+        });
         rs.list = await this.aggregate(pipe);
         //总数
         rs.total = await this.count(filter);

@@ -212,9 +212,9 @@ function getConfig() {
             },
             "data": [  //奖品展示标题
                 {
-                    title: "用户昵称", type: "nick", target: {
+                    title: "领奖状态", type: "receiveStatus", target: {
                         boolean: true,
-                        filed: "$user.nick"
+                        filed: "$receiveStatus"
                     }
                 },
             ]

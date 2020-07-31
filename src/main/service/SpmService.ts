@@ -13,4 +13,11 @@ export default class SpmService extends BaseService<SpmDao, {}> {
     async add(type) {
         return await this.dao.add(type);
     }
+
+    /**
+     * 导出统计
+     */
+    async exportStatistics() {
+        let {activityId, startTime, endTime} = this.data;
+    }
 }

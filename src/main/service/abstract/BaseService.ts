@@ -24,7 +24,7 @@ export default abstract class BaseService<T extends BaseDao, E extends BaseEntit
     protected openId: string;
     protected mixNick: string;
     protected activityId: string;
-    protected time = Utils.time()
+    protected time: any = Utils.time();
 
     /**
      * 新增
@@ -49,6 +49,18 @@ export default abstract class BaseService<T extends BaseDao, E extends BaseEntit
      */
     async delete(filter) {
         return await this.dao.delete(filter);
+    }
+
+    /**
+     * 统计查询
+     * @param filter
+     */
+    async count(filter) {
+        return await this.dao.count(filter);
+    }
+
+    async aggregate(pipe: []) {
+        return await this.dao.aggregate(pipe);
     }
 
 

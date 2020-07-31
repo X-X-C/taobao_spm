@@ -206,9 +206,15 @@ exports.selectWinnerData = async (context) => {
 // @ts-ignore
 exports.exportStatistics = async (context) => {
     const app = new App(context, "exportStatistics");
+    let need = {
+        activityId: "",
+        startTime: "",
+        endTime: ""
+    }
     return await app.run(async function () {
-        // do...
-    });
+        let spmService = new SpmService(context);
+
+    }, need);
 }
 
 // @ts-ignore

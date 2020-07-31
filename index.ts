@@ -2,7 +2,7 @@ import App from "./src/main/App";
 import SpmService from "./src/main/service/SpmService";
 import BaseResult from "./src/main/dto/BaseResult";
 // @ts-ignore
-import * as gmtaobao from "gmtaobao";
+import * as gm from "gmtaobao";
 import ErrorLogService from "./src/main/service/ErrorLogService";
 import ErrorLog from "./src/main/entity/ErrorLog";
 //请求成功是否返回参数
@@ -152,7 +152,6 @@ exports.selectUiTitleAndType = async (context) => {
 };
 
 
-
 /**
  * 用户昵称查询
  * @param context
@@ -224,9 +223,9 @@ exports.spm = async (context) => {
 }
 // @ts-ignore
 exports.spmCount = async (context) => {
-    return await gmtaobao.spm.spmCount(context);
+    return await gm.spm.spmCount(context);
 };
 // @ts-ignore
 exports.disUser = async (context) => {
-    return await gmtaobao.spm.disUser(context);
+    return await gm.spm.disUser(context);
 };

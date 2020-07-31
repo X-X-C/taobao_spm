@@ -5,6 +5,7 @@ import BaseResult from "./src/main/dto/BaseResult";
 import * as gm from "gmtaobao";
 import ErrorLogService from "./src/main/service/ErrorLogService";
 import ErrorLog from "./src/main/entity/ErrorLog";
+import PrizeService from "./src/main/service/PrizeService";
 //请求成功是否返回参数
 App.config.returnParams = true;
 //每次请求都必须要的参数
@@ -80,7 +81,9 @@ exports.exportWinnerData = async (context) => {
 exports.selectWinnerData = async (context) => {
     const app = new App(context, "selectWinnerData");
     return await app.run(async function () {
-        // do...
+        let prizeService = new PrizeService(context);
+        let rs = await prizeService.selectWinnerData(getSelectWinnersConfig());
+        return BaseResult.success("成功", rs);
     });
 }
 /**
@@ -120,6 +123,21 @@ exports.spmCount = async (context) => {
 exports.disUser = async (context) => {
     return await gm.spm.disUser(context);
 };
+
+
+/**
+ * 获取查询中奖信息配置
+ */
+function getSelectWinnersConfig() {
+    let config: any = getConfig();
+    config = config.selectWinnerTitleAndTypeArr.data;
+    let selConfig: any = {};
+    config.forEach(v => {
+        //输出字段设置
+        selConfig[v.type] = v.target;
+    });
+    return selConfig;
+}
 
 
 /**
@@ -170,31 +188,36 @@ function getConfig() {
         ],
         //统计数据导出配置
         "exportStatistics": {
-            // "fixParameter": {},//固定参数，调用接口会默认传入内部所有参数
-            // "fun": "exportStatistics",//接口名称
-            // "title": "导出"
+            "fixParameter": {},//固定参数，调用接口会默认传入内部所有参数
+            "fun": "exportStatistics",//接口名称
+            "title": "导出"
         },
         //中奖数据查询配置
         "selectWinnerTitleAndTypeArr": {
-            // "title": "标题", //标题
-            // "showTime": true,//是否需要时间查询
-            // "fun": "selectWinnerData",//云函数方法名，自定义
-            // "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
-            // "parameter": {  //动态参数，比如 type:'type值1'
-            //     "type": {
-            //         "type": "radio", //单选框
-            //         "title": "类型标题",
-            //         "options": [
-            //             {
-            //                 "title": "标题1",
-            //                 "value": "type值1"
-            //             },
-            //         ]
-            //     }
-            // },
-            // "data": [  //奖品展示标题
-            //     {title: "用户昵称", type: "nick"}
-            // ]
+            "title": "标题", //标题
+            "showTime": true,//是否需要时间查询
+            "fun": "selectWinnerData",//云函数方法名，自定义
+            "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
+            "parameter": {  //动态参数，比如 type:'type值1'
+                "type": {
+                    "type": "radio", //单选框
+                    "title": "类型标题",
+                    "options": [
+                        {
+                            "title": "标题1",
+                            "value": "type值1"
+                        },
+                    ]
+                }
+            },
+            "data": [  //奖品展示标题
+                {
+                    title: "用户昵称", type: "nick", target: {
+                        boolean: true,
+                        filed: "$user.nick"
+                    }
+                },
+            ]
         },
         //中奖数据导出
         "winnerTitleAndTypeArr": [

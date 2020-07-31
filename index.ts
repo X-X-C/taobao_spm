@@ -26,9 +26,8 @@ exports.main = async (context) => {
 }
 
 /**
- * 配置
+ * 获取配置
  * @param context
- * @doc https://www.yuque.com/ggikb6/towlr0/qpy01t
  */
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
@@ -168,6 +167,7 @@ function getExportStatisticsConfig() {
 
 /**
  * 获取配置
+ * @doc https://www.yuque.com/ggikb6/towlr0/qpy01t
  */
 function getConfig() {
     return {

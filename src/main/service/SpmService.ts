@@ -11,6 +11,6 @@ export default class SpmService extends BaseService<SpmDao, {}> {
      * @param type
      */
     async add(type) {
-        return await super.add(type);
+        return await this.dao.add(type);
     }
 }

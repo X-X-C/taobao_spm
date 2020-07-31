@@ -56,9 +56,13 @@ exports.selectUiTitleAndType = async (context) => {
 
 // @ts-ignore
 exports.spm = async (context) => {
-    let spmService = new SpmService(context);
-    await spmService.add(this.type);
-    return BaseResult.success();
+    const app = new App(context, "spm");
+    let need = {type: ""}
+    return await app.run(async function () {
+        let spmService = new SpmService(context);
+        await spmService.add(this.type);
+        return BaseResult.success();
+    }, need);
 }
 // @ts-ignore
 exports.spmCount = async (context) => {

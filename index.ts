@@ -213,7 +213,14 @@ exports.exportStatistics = async (context) => {
     }
     return await app.run(async function () {
         let spmService = new SpmService(context);
-
+        return await spmService.exportStatistics({
+            count: {
+                view: "PV"
+            },
+            noRepeat: {
+                view: "UV"
+            }
+        })
     }, need);
 }
 

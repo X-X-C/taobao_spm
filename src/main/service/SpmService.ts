@@ -1,5 +1,6 @@
 import SpmDao from "../dao/SpmDao";
 import BaseService from "./abstract/BaseService";
+import Utils from "../utils/Utils";
 
 export default class SpmService extends BaseService<SpmDao, {}> {
     constructor(context) {
@@ -49,8 +50,11 @@ export default class SpmService extends BaseService<SpmDao, {}> {
             }
         }
 
-        let count = spmMapping(config.count, creat)
-        let noRepeat = spmMapping(config.noRepeat, creat);
+        let exportData: any = config.exportData;
+        let count: any = spmMapping(config.count, creat)
+        let noRepeat: any = spmMapping(config.noRepeat, creat);
+        //TODO 额外统计
+        let ext: any = config.ext;
         //获取结果
         let rs = await this.aggregate([
             {
@@ -94,10 +98,32 @@ export default class SpmService extends BaseService<SpmDao, {}> {
                 }
             }
         ]);
-        return rs;
+        rs = rs[0];
+        count = rs.count;
+        noRepeat = rs.noRepeat;
+        count = count.map(v => {
+            let r = noRepeat.find((v1) => v1._id.date === v._id.date);
+            v = {...v, ...r};
+            let o = {
+                "日期": v._id.date
+            }
+            for (let key in exportData) {
+                let target = exportData[key];
+                o[target] = v[key];
+            }
+            return o;
+        });
+        noRepeat = null;
+        rs = count;
+        count = null;
+        if (rs.length <= 0) {
+            return false;
+        }
+        //拿到表格buffer
+        let buffer = Utils.jsonToExcelBuffer(rs);
+        return this.uploadFile(buffer, `day/${this.time.YYYYMMDD}.xlsx`)
     }
 }
-
 
 /**
  * 映射出相同的配置

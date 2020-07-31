@@ -31,17 +31,138 @@ exports.main = async (context) => {
  */
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
-    let data = {
+    let data = getConfig();
+    return BaseResult.success("成功", data);
+};
+
+
+/**
+ * 用户昵称查询
+ * @param context
+ */
+// @ts-ignore
+exports.selectInfoByNick = async (context) => {
+    const app = new App(context, "selectInfoByNick");
+    return await app.run(async function () {
+        // do...
+    });
+}
+
+/**
+ * 导出用户昵称
+ * @param context
+ */
+// @ts-ignore
+exports.exportUserNick = async (context) => {
+    const app = new App(context, "exportUserNick");
+    return await app.run(async function () {
+        // do...
+    });
+}
+
+/**
+ * 导出中奖数据
+ * @param context
+ */
+// @ts-ignore
+exports.exportWinnerData = async (context) => {
+    const app = new App(context, "exportWinnerData");
+    return await app.run(async function () {
+        // do...
+    });
+}
+
+/**
+ * 查询中奖数据
+ * @param context
+ */
+// @ts-ignore
+exports.selectWinnerData = async (context) => {
+    const app = new App(context, "selectWinnerData");
+    return await app.run(async function () {
+        // do...
+    });
+}
+/**
+ * 导出统计数据
+ * @param context
+ */
+// @ts-ignore
+exports.exportStatistics = async (context) => {
+    const app = new App(context, "exportStatistics");
+    let need = {
+        activityId: "",
+    }
+    return await app.run(async function () {
+        let spmService = new SpmService(context);
+        let url = await spmService.exportStatistics(getExportStatisticsConfig())
+        return BaseResult.success("成功", {
+            url
+        })
+    }, need);
+}
+
+// @ts-ignore
+exports.spm = async (context) => {
+    const app = new App(context, "spm");
+    let need = {type: ""}
+    return await app.run(async function () {
+        let spmService = new SpmService(context);
+        await spmService.add(this.type);
+        return BaseResult.success();
+    }, need);
+}
+// @ts-ignore
+exports.spmCount = async (context) => {
+    return await gm.spm.spmCount(context);
+};
+// @ts-ignore
+exports.disUser = async (context) => {
+    return await gm.spm.disUser(context);
+};
+
+
+/**
+ * 获取到处统计数据配置
+ */
+function getExportStatisticsConfig() {
+    let config: any = getConfig();
+    config = config.statisticsTitleAndTypeArr;
+    let exConfig = {
+        count: {},
+        noRepeat: {},
+        ext: {},
+        exportData: {}
+    };
+    config.forEach((v) => {
+        let type = v.parameter.type;
+        if (v.fun === "spmCount") {
+            exConfig.count[type] = v.type;
+        } else if (v.fun === "disUser") {
+            exConfig.noRepeat[type] = v.type;
+        } else {
+            exConfig.ext[type] = v.type;
+        }
+        exConfig.exportData[v.type] = v.title;
+    });
+    return exConfig;
+}
+
+/**
+ * 获取配置
+ */
+function getConfig() {
+    return {
         //统计数据配置
         "statisticsTitleAndTypeArr": [
             {
-                "title": "总独立访问次数",
+                "title": "PV",
                 "type": "PV",
                 "parameter": {"type": "view"},
                 "fun": "spmCount"
             },
             {
-                "title": "总独立访客人数",
+                "title": "UV",
                 "type": "UV",
                 "parameter": {"type": "view"},
                 "fun": "disUser"
@@ -148,97 +269,4 @@ exports.selectUiTitleAndType = async (context) => {
             //     }
         ]
     }
-    return BaseResult.success("成功", data);
-};
-
-
-/**
- * 用户昵称查询
- * @param context
- */
-// @ts-ignore
-exports.selectInfoByNick = async (context) => {
-    const app = new App(context, "selectInfoByNick");
-    return await app.run(async function () {
-        // do...
-    });
 }
-
-/**
- * 导出用户昵称
- * @param context
- */
-// @ts-ignore
-exports.exportUserNick = async (context) => {
-    const app = new App(context, "exportUserNick");
-    return await app.run(async function () {
-        // do...
-    });
-}
-
-/**
- * 导出中奖数据
- * @param context
- */
-// @ts-ignore
-exports.exportWinnerData = async (context) => {
-    const app = new App(context, "exportWinnerData");
-    return await app.run(async function () {
-        // do...
-    });
-}
-
-/**
- * 查询中奖数据
- * @param context
- */
-// @ts-ignore
-exports.selectWinnerData = async (context) => {
-    const app = new App(context, "selectWinnerData");
-    return await app.run(async function () {
-        // do...
-    });
-}
-/**
- * 导出统计数据
- * @param context
- */
-// @ts-ignore
-exports.exportStatistics = async (context) => {
-    const app = new App(context, "exportStatistics");
-    let need = {
-        activityId: "",
-        startTime: "",
-        endTime: ""
-    }
-    return await app.run(async function () {
-        let spmService = new SpmService(context);
-        return await spmService.exportStatistics({
-            count: {
-                view: "PV"
-            },
-            noRepeat: {
-                view: "UV"
-            }
-        })
-    }, need);
-}
-
-// @ts-ignore
-exports.spm = async (context) => {
-    const app = new App(context, "spm");
-    let need = {type: ""}
-    return await app.run(async function () {
-        let spmService = new SpmService(context);
-        await spmService.add(this.type);
-        return BaseResult.success();
-    }, need);
-}
-// @ts-ignore
-exports.spmCount = async (context) => {
-    return await gm.spm.spmCount(context);
-};
-// @ts-ignore
-exports.disUser = async (context) => {
-    return await gm.spm.disUser(context);
-};

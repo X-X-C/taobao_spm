@@ -79,33 +79,44 @@ export default class Utils {
     /**
      * 将excelBuffer转换为json
      * @param buffer
-     * @param defineHeader 定义表头与键
+     * @param defineHeader
      * @param who  读取第几张表
      */
     static parseExcel(buffer, defineHeader: any = {}, who: number = 0) {
         let data, workbook, header;
-        workbook = xlsx.read(buffer, {type: "buffer"});
+        workbook = xlsx.read(buffer, {
+            type: "buffer"
+        });
         //读取表的数据
         data = workbook.Sheets[workbook.SheetNames[who]];
-        //读取表头
-        header = xlsx.utils.sheet_to_json(data, {header: 1})[0];
-        //判断表头是否拥有所有字段
-        for (let key in defineHeader) {
-            let v = defineHeader[key];
-            if (header.indexOf(v) == -1) {
-                return false;
-            }
-        }
         data = xlsx.utils.sheet_to_json(data);
-        //映射对应的键
-        data = data.map(v => {
-            for (let key in defineHeader) {
-                let targetKey = defineHeader[key];
-                v[key] = v[targetKey];
-                delete v[targetKey];
-            }
-            return v;
-        });
+        try {
+            let header = true;
+            //映射对应的键
+            data = data.map(v => {
+                let o = {};
+                for (let key in defineHeader) {
+                    let targetKey = defineHeader[key];
+                    //如果是表头
+                    if (header === true) {
+                        //如果表头中没有对应的键
+                        if (typeof v[targetKey] === "undefined") {
+                            throw "缺少字段" + targetKey
+                        }
+                        let regex = /(time|时间)/i;
+                        //如果包含时间
+                        if (regex.test(key) || regex.test(targetKey)) {
+                            v[targetKey] = this.parseExcelDate(v[targetKey]) || v[targetKey];
+                        }
+                    }
+                    o[key] = v[targetKey];
+                }
+                header = false;
+                return o;
+            });
+        } catch (e) {
+            return false;
+        }
         return data;
     }
 

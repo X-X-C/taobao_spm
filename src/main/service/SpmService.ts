@@ -121,7 +121,7 @@ export default class SpmService extends BaseService<SpmDao, {}> {
         }
         //拿到表格buffer
         let buffer = Utils.jsonToExcelBuffer(rs);
-        return this.uploadFile(buffer, `day/${this.time.YYYYMMDD}.xlsx`)
+        return await this.uploadFile(buffer, `day/${this.time.YYYYMMDD}.xlsx`)
     }
 }
 

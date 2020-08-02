@@ -68,7 +68,11 @@ exports.exportUserNick = async (context) => {
 exports.exportWinnerData = async (context) => {
     const app = new App(context, "exportWinnerData");
     return await app.run(async function () {
-        // do...
+        let prizeService = new PrizeService(context);
+        let url = await prizeService.exportsWinnerData(getSelectWinnersConfig());
+        return BaseResult.success("成功", {
+            url
+        })
     });
 }
 
@@ -214,34 +218,35 @@ function getConfig() {
                 {
                     title: "领奖状态", type: "receiveStatus", target: {
                         boolean: true,
-                        filed: "$receiveStatus"
+                        filed: "$receiveStatus",
+                        exportKey: "领奖状态"
                     }
                 },
             ]
         },
         //中奖数据导出
         "winnerTitleAndTypeArr": [
-            // {
-            //     "title": "标题",
-            //     "export": {
-            //         "title": "标题", //标题
-            //         "showTime": true,//是否需要时间查询
-            //         "fun": "exportWinnerData",//云函数方法名，自定义
-            //         "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
-            //         "parameter": {  //动态参数，比如 type:'type值1'
-            //             "type": {
-            //                 "type": "radio", //单选框
-            //                 "title": "类型标题",
-            //                 "options": [
-            //                     {
-            //                         "title": "标题1",
-            //                         "value": "type值1"
-            //                     }
-            //                 ]
-            //             }
-            //         }
-            //     }
-            // }
+            {
+                "title": "标题",
+                "export": {
+                    "title": "标题", //标题
+                    "showTime": true,//是否需要时间查询
+                    "fun": "exportWinnerData",//云函数方法名，自定义
+                    "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
+                    "parameter": {  //动态参数，比如 type:'type值1'
+                        "type": {
+                            "type": "radio", //单选框
+                            "title": "类型标题",
+                            "options": [
+                                {
+                                    "title": "所有",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         ],
         //用户昵称导出
         "userNicksExportsArr": [

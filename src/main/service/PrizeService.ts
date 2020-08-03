@@ -19,7 +19,10 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
             exportKey: true, //是否使用倒出数据的键
         }
         //获取中奖列表
-        let data = await this.selectWinnerData(config, options);
+        let data: any = await this.selectWinnerData(config, options);
+        if (data.length <= 0) {
+            return "没有相关数据";
+        }
         //将数据转换为excel buffer
         let buffer = Utils.jsonToExcelBuffer(data);
         //上传文件,返回Url

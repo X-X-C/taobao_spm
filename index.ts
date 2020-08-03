@@ -71,7 +71,7 @@ exports.exportWinnerData = async (context) => {
         let prizeService = new PrizeService(context);
         let url = await prizeService.exportsWinnerData(getSelectWinnersConfig());
         return BaseResult.success("成功", {
-            url
+            outUrl: url
         })
     });
 }
@@ -103,7 +103,7 @@ exports.exportStatistics = async (context) => {
         let spmService = new SpmService(context);
         let url = await spmService.exportStatistics(getExportStatisticsConfig())
         return BaseResult.success("成功", {
-            url
+            outUrl: url
         })
     }, need);
 }

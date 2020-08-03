@@ -28,7 +28,7 @@ export default class SpmService extends BaseService<SpmDao, {}> {
         if (startTime || endTime) {
             filter.timestr = {};
             !startTime || (filter.timestr.$gte = startTime);
-            !endTime || (filter.timestr.lte = startTime);
+            !endTime || (filter.timestr.$lte = startTime);
         }
 
         /**

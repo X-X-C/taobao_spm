@@ -62,7 +62,7 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         if (startTime || endTime) {
             filter["time.base"] = {};
             !startTime || (filter["time.base"].$gte = startTime);
-            !endTime || (filter["time.base"].$lte = startTime);
+            !endTime || (filter["time.base"].$lte = endTime);
         }
         let pipe: any = [
             {

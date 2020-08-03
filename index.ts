@@ -208,8 +208,8 @@ function getConfig() {
                     "title": "类型标题",
                     "options": [
                         {
-                            "title": "标题1",
-                            "value": "type值1"
+                            "title": "所有类型",
+                            "value": ""
                         },
                     ]
                 }
@@ -239,7 +239,7 @@ function getConfig() {
                             "title": "类型标题",
                             "options": [
                                 {
-                                    "title": "所有",
+                                    "title": "所有类型",
                                     "value": ""
                                 }
                             ]

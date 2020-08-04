@@ -11,26 +11,28 @@ export default class UserNickService extends BaseService<BaseDao, {}> {
     async exportUserNick() {
         let target = this.data.type;
         let {startTime, endTime} = this.data;
-        let {filed, sort} = this.data.target;
+        let {filed, timeField} = this.data.target;
         let filter: any = {
             [filed]: target
         };
         //初始化时间查询
         if (startTime || endTime) {
-            filter["time.base"] = {};
-            !startTime || (filter["time.base"].$gte = startTime);
-            !endTime || (filter["time.base"].$lte = endTime);
+            filter[timeField] = {};
+            !startTime || (filter[timeField].$gte = startTime);
+            !endTime || (filter[timeField].$lte = endTime);
         }
         let pipe = [
             {
-                $sort: sort
+                $sort: {
+                    [timeField]: -1
+                }
             },
             {
                 $match: filter
             },
             {
                 $group: {
-                    _id: "openId",
+                    _id: "$openId",
                     nick: {
                         $first: filed
                     }
@@ -39,12 +41,12 @@ export default class UserNickService extends BaseService<BaseDao, {}> {
             {
                 $project: {
                     _id: 0,
-                    [filed]: 1
+                    [`$${filed}`]: 1
                 }
             }
         ]
         let rs = await this.aggregate(pipe);
-        if(rs.length > 0){
+        if (rs.length > 0) {
             let buffer = Utils.jsonToExcelBuffer(rs);
             return await this.uploadFile(buffer, `nick/${(new Time()).x}.xlsx`);
         }

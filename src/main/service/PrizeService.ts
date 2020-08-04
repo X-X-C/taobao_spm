@@ -98,14 +98,14 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
                 project[key] = {
                     $cond: {
                         if: {
-                            $eq: [v.filed, true],
+                            $eq: [v.field, true],
                         },
                         then: "是",
                         else: "否"
                     }
                 }
             } else {
-                project[key] = v.filed;
+                project[key] = v.field;
             }
         }
         pipe.push({

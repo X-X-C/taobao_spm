@@ -223,7 +223,7 @@ function getConfig() {
                 {
                     title: "领奖状态", type: "receiveStatus", target: {
                         boolean: true,
-                        filed: "$receiveStatus",
+                        field: "$receiveStatus",
                         exportKey: "领奖状态"
                     }
                 },
@@ -264,10 +264,8 @@ function getConfig() {
                     "fixParameter": {
                         tb: "user",
                         target: {
-                            filed: "$id",
-                            sort: {
-                                "$id": -1
-                            }
+                            field: "nick",
+                            timeField: "date"
                         }
                     },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'

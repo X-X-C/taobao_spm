@@ -36,26 +36,6 @@ export default class Utils {
 
 
     /**
-     * 获取时间对象
-     * @param date
-     */
-    static time(date = new Date()) {
-        return {
-            base: moment(date).format("YYYY-MM-DD HH:mm:ss"),
-            YYYYMMDD: moment(date).format("YYYYMMDD"),
-            X: moment(date).format("X"),
-            x: moment(date).format("x"),
-            bean: moment(date),
-            to: (number = 0, string = "d") => {
-                // @ts-ignore
-                return Utils.time(moment(date).add(number, string));
-            },
-            format: (str) => moment(date).format(str),
-        };
-    }
-
-
-    /**
      * 将excel里的时间转换为标准时间格式
      * @param number
      */

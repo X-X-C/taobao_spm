@@ -263,8 +263,9 @@ function getConfig() {
             //                 "title": "类型标题",
             //                 "options": [
             //                     {
-            //                         "title": "标题1",
-            //                         "value": "type值1"
+            //                         "title": "全部",
+            //                         "value": "",
+            //                         "tb": "testTb"
             //                     }
             //                 ]
             //             }
@@ -274,27 +275,28 @@ function getConfig() {
         ],
         //用户ID查询
         "behaviorTitleAndTypeArr": [
-            //     {
-            //         "title": "标题",
-            //         "export": {
-            //             "title": "标题", //标题
-            //             "showTime": true,//是否需要时间查询
-            //             "fun": "selectInfoByNick",//云函数方法名，自定义
-            //             "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
-            //             "parameter": {  //动态参数，比如 type:'type值1'
-            //                 "type": {
-            //                     "type": "radio", //单选框
-            //                     "title": "类型标题",
-            //                     "options": [
-            //                         {
-            //                             "title": "标题1",
-            //                             "value": "type值1"
-            //                         }
-            //                     ]
-            //                 }
+            // {
+            //     "title": "标题",
+            //     "export": {
+            //         "title": "标题", //标题
+            //         "showTime": true,//是否需要时间查询
+            //         "fun": "selectInfoByNick",//云函数方法名，自定义
+            //         "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
+            //         "parameter": {  //动态参数，比如 type:'type值1'
+            //             "type": {
+            //                 "type": "radio", //单选框
+            //                 "title": "类型标题",
+            //                 "options": [
+            //                     {
+            //                         "title": "所有",
+            //                         "value": "",
+            //                         "tb": "spm"
+            //                     }
+            //                 ]
             //             }
             //         }
             //     }
+            // }
         ]
     }
 }

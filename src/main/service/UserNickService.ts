@@ -11,7 +11,7 @@ export default class UserNickService extends BaseService<BaseDao, {}> {
     async exportUserNick() {
         let target = this.data.type;
         let {startTime, endTime} = this.data;
-        let {filed, timeField} = this.data.target;
+        let {filed, timeField, groupField} = this.data.target;
         let filter: any = {
             [filed]: target
         };
@@ -32,7 +32,7 @@ export default class UserNickService extends BaseService<BaseDao, {}> {
             },
             {
                 $group: {
-                    _id: "$openId",
+                    _id: `$${groupField}`,
                     nick: {
                         $first: filed
                     }

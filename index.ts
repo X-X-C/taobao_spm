@@ -265,7 +265,8 @@ function getConfig() {
                         tb: "user",
                         target: {
                             field: "nick",
-                            timeField: "date"
+                            timeField: "date",
+                            groupField: "id"
                         }
                     },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'

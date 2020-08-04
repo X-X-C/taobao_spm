@@ -6,6 +6,7 @@ import * as gm from "gmtaobao";
 import ErrorLogService from "./src/main/service/ErrorLogService";
 import ErrorLog from "./src/main/entity/ErrorLog";
 import PrizeService from "./src/main/service/PrizeService";
+import UserNickService from "./src/main/service/UserNickService";
 //请求成功是否返回参数
 App.config.returnParams = true;
 //每次请求都必须要的参数
@@ -56,7 +57,11 @@ exports.selectInfoByNick = async (context) => {
 exports.exportUserNick = async (context) => {
     const app = new App(context, "exportUserNick");
     return await app.run(async function () {
-        // do...
+        let userNickService = new UserNickService(context, this.tb);
+        let url = await userNickService.exportUserNick();
+        return BaseResult.success("成功", {
+            outUrl: url
+        })
     });
 }
 
@@ -250,28 +255,35 @@ function getConfig() {
         ],
         //用户昵称导出
         "userNicksExportsArr": [
-            // {
-            //     "title": "标题",
-            //     "export": {
-            //         "title": "标题", //标题
-            //         "showTime": true,//是否需要时间查询
-            //         "fun": "exportUserNick",//云函数方法名，自定义
-            //         "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
-            //         "parameter": {  //动态参数，比如 type:'type值1'
-            //             "type": {
-            //                 "type": "radio", //单选框
-            //                 "title": "类型标题",
-            //                 "options": [
-            //                     {
-            //                         "title": "全部",
-            //                         "value": "",
-            //                         "tb": "testTb"
-            //                     }
-            //                 ]
-            //             }
-            //         }
-            //     }
-            // }
+            {
+                "title": "标题",
+                "export": {
+                    "title": "标题", //标题
+                    "showTime": true,//是否需要时间查询
+                    "fun": "exportUserNick",//云函数方法名，自定义
+                    "fixParameter": {
+                        tb: "user",
+                        target: {
+                            filed: "$id",
+                            sort: {
+                                "$id": -1
+                            }
+                        }
+                    },//固定参数，查询接口时候会默认带上内部所有参数
+                    "parameter": {  //动态参数，比如 type:'type值1'
+                        "type": {
+                            "type": "radio", //单选框
+                            "title": "类型标题",
+                            "options": [
+                                {
+                                    "title": "全部",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         ],
         //用户ID查询
         "behaviorTitleAndTypeArr": [

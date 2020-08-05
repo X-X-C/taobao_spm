@@ -103,7 +103,10 @@ export default class Utils {
     /**
      * 将json转化为excel buffer
      * @param excelJson
-     * @param ext
+     * @param ext {
+     *     header: [],
+     *     skipHeader: false  不需要表头
+     * }
      */
     static jsonToExcelBuffer(excelJson, ext = {}) {
         //将json转换为xlsx的sheet格式

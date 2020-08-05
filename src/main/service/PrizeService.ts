@@ -23,8 +23,13 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         if (data.length <= 0) {
             return "没有相关数据";
         }
+        //获取表头
+        let head = [];
+        for (let key in config) {
+            head.push(config[key].exportKey)
+        }
         //将数据转换为excel buffer
-        let buffer = Utils.jsonToExcelBuffer(data);
+        let buffer = Utils.jsonToExcelBuffer(data, {header: head});
         //上传文件,返回Url
         return await this.uploadFile(buffer, "winners/" + this.time.x + ".xlsx");
     }

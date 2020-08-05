@@ -1,6 +1,5 @@
 import BaseDao from "../../dao/abstract/BaseDao";
 import BaseEntity from "../../entity/abstract/BaseEntity";
-import Utils from "../../utils/Utils";
 import Time from "../../utils/Time";
 
 export default abstract class BaseService<T extends BaseDao, E extends BaseEntity> {
@@ -71,15 +70,18 @@ export default abstract class BaseService<T extends BaseDao, E extends BaseEntit
      * 返回分页数据
      * @param filter
      * @param options
+     * @param dividePage    是否分页
      */
-    async list(filter: any = {}, options: any = {}) {
-        let {size, page} = this.data;
+    async list(filter: any = {}, options: any = {}, dividePage = true) {
         let rs: any = {};
-        if (size && page) {
-            options.skip = (page - 1) * size;
-            options.limit = size;
-            let count = await this.dao.count(filter);
-            rs.total = Math.ceil(count / size);
+        if (dividePage === true) {
+            let {size, page} = this.data;
+            if (size && page) {
+                options.skip = (page - 1) * size;
+                options.limit = size;
+                let count = await this.dao.count(filter);
+                rs.total = Math.ceil(count / size);
+            }
         }
         rs.data = await this.dao.find(filter, options);
         return rs;
@@ -91,7 +93,7 @@ export default abstract class BaseService<T extends BaseDao, E extends BaseEntit
      * @param options
      */
     async get(filter = {}, options = {}) {
-        return (await this.list(filter, options)).data[0];
+        return (await this.list(filter, options, false)).data[0];
     }
 
     /**
@@ -100,7 +102,7 @@ export default abstract class BaseService<T extends BaseDao, E extends BaseEntit
      * @param options
      */
     async getAll(filter = {}, options = {}) {
-        return (await this.list(filter, options)).data;
+        return (await this.list(filter, options, false)).data;
     }
 
     /**
@@ -109,11 +111,6 @@ export default abstract class BaseService<T extends BaseDao, E extends BaseEntit
      */
     async downloadFile(fileId) {
         return await this.cloud.file.downloadFile({fileId});
-    }
-
-
-    async mapping() {
-
     }
 
     /**

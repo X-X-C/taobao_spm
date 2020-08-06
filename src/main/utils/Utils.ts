@@ -3,10 +3,8 @@ import BaseResult from "../dto/BaseResult";
 import * as xlsx from "xlsx";
 // @ts-ignore
 import * as randombyweights from "randombyweights";
-//@ts-ignore
-import * as moment from "moment-timezone"
-//设置时区
-moment.tz.setDefault("Asia/Shanghai");
+// @ts-ignore
+import * as qr from "qr-image";
 
 export default class Utils {
     /**
@@ -83,11 +81,6 @@ export default class Utils {
                         if (typeof v[targetKey] === "undefined") {
                             throw "缺少字段" + targetKey
                         }
-                        let regex = /(time|时间)/i;
-                        //如果包含时间
-                        if (regex.test(key) || regex.test(targetKey)) {
-                            v[targetKey] = this.parseExcelDate(v[targetKey]) || v[targetKey];
-                        }
                     }
                     o[key] = v[targetKey];
                 }
@@ -104,8 +97,7 @@ export default class Utils {
      * 将json转化为excel buffer
      * @param excelJson
      * @param ext {
-     *     header: [],
-     *     skipHeader: false  不需要表头
+     *     header: []
      * }
      */
     static jsonToExcelBuffer(excelJson, ext = {}) {
@@ -118,14 +110,6 @@ export default class Utils {
         xlsx.utils.book_append_sheet(workbook, sheet, "sheet");
         //返回写出的工作簿buffer
         return xlsx.write(workbook, {type: "buffer"});
-    }
-
-    /**
-     * 获取对象类型
-     * @param any
-     */
-    static getType(any) {
-        return Object.prototype.toString.call(any);
     }
 
     /**
@@ -170,5 +154,14 @@ export default class Utils {
                 target[key] = v;
             }
         }
+    }
+
+
+    /**
+     * 解析url为base64二维码
+     * @param url
+     */
+    static qrImage(url) {
+        return 'data:image/png;base64,' + Buffer.from(qr.imageSync(url), 'utf8').toString('base64');
     }
 }

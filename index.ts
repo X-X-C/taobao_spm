@@ -142,6 +142,7 @@ function getSelectWinnersConfig() {
     config.forEach(v => {
         //输出字段设置
         selConfig[v.type] = v.target;
+        selConfig[v.type].exportKey = v.title;
     });
     return selConfig;
 }
@@ -207,7 +208,7 @@ function getConfig() {
         },
         //中奖数据查询配置
         "selectWinnerTitleAndTypeArr": {
-            "title": "标题", //标题
+            "title": "中奖数据查询", //标题
             "showTime": true,//是否需要时间查询
             "fun": "selectWinnerData",//云函数方法名，自定义
             "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
@@ -227,8 +228,7 @@ function getConfig() {
                 {
                     title: "领奖状态", type: "receiveStatus", target: {
                         boolean: true,
-                        field: "$receiveStatus",
-                        exportKey: "领奖状态"
+                        field: "$receiveStatus"
                     }
                 },
             ]

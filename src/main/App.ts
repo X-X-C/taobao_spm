@@ -11,10 +11,6 @@ export default class App {
         returnParams: false,
         needParams: {}
     }
-    //异常后的操作
-    static errorDo: Function = (e) => {
-        console.log(e)
-    }
 
     /**
      * 运行方法 可以捕获异常并处理
@@ -52,12 +48,6 @@ export default class App {
             }
             //将本次请求异常的参数记录
             Object.assign(response, {params})
-            try {
-                //用户自行对异常对象进行操作
-                await App.errorDo.call(this, response);
-            } catch (e) {
-                //...能异常到这里来基本上就是本质上的错误
-            }
             //直接返回异常对象
             return response;
         }

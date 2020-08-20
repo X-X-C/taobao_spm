@@ -8,14 +8,6 @@ export default class SpmService extends BaseService<SpmDao, {}> {
     }
 
     /**
-     * 新增统计
-     * @param type
-     */
-    async add(type) {
-        return await this.dao.add(type);
-    }
-
-    /**
      * 导出统计
      */
     async exportStatistics(config: any) {

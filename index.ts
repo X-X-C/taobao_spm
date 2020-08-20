@@ -132,7 +132,6 @@ exports.disUser = async (context) => {
     return await gm.spm.disUser(context);
 };
 
-
 /**
  * 获取查询中奖信息配置
  */
@@ -157,19 +156,24 @@ function getExportStatisticsConfig() {
     let exConfig = {
         count: {},
         noRepeat: {},
-        ext: {},
-        exportData: {}
+        exportMapping: {}
     };
     config.forEach((v) => {
         let type = v.parameter.type;
-        if (v.fun === "spmCount") {
-            exConfig.count[type] = v.type;
-        } else if (v.fun === "disUser") {
-            exConfig.noRepeat[type] = v.type;
-        } else {
-            exConfig.ext[type] = v.type;
+        exConfig.exportMapping[v.type] = v.title;
+        let data = {
+            type: v.type,
+            exportKey: v.title,
+            extMatch: v.extMatch || false,
+            reMatch: v.reMatch || false,
+            repeat: true
         }
-        exConfig.exportData[v.type] = v.title;
+        if (v.fun === "spmCount") {
+            exConfig.count[type] = data
+        } else if (v.fun === "disUser") {
+            data.repeat = false;
+            exConfig.noRepeat[type] = data
+        }
     });
     return exConfig;
 }

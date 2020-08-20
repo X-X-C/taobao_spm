@@ -30,32 +30,9 @@ export default class SpmService extends BaseService<SpmDao, {}> {
             !startTime || (filter.timestr.$gte = startTime);
             !endTime || (filter.timestr.$lte = endTime);
         }
-
-        /**
-         * 创建对应查询条件
-         * @param v
-         * @param k
-         * @param addField
-         */
-        function creat(v, k, addField) {
-            return {
-                $sum: {
-                    $cond: {
-                        if: {
-                            $eq: [addField, k]
-                        },
-                        then: 1,
-                        else: 0
-                    }
-                }
-            }
-        }
-
-        let exportData: any = config.exportData;
-        let count: any = spmMapping(config.count, creat, "$type")
-        let noRepeat: any = spmMapping(config.noRepeat, creat, "$_id.type");
-        //TODO 额外统计
-        let ext: any = config.ext;
+        let exportMapping: any = config.exportMapping;
+        let count: any = spmMapping(config.count)
+        let noRepeat: any = spmMapping(config.noRepeat);
         //获取结果
         let rs = await this.aggregate([
             {
@@ -110,8 +87,8 @@ export default class SpmService extends BaseService<SpmDao, {}> {
             let o = {
                 "日期": v._id
             }
-            for (let key in exportData) {
-                let target = exportData[key];
+            for (let key in exportMapping) {
+                let target = exportMapping[key];
                 o[target] = v[key];
             }
             return o;
@@ -128,18 +105,47 @@ export default class SpmService extends BaseService<SpmDao, {}> {
     }
 }
 
-/**
- * 映射出相同的配置
- * @param origin    源
- * @param callback  操作
- * @param field
- */
-function spmMapping(origin: any, callback: Function, field) {
-    let o = {};
-    for (let k in origin) {
-        let v = origin[k];
-        o[v] = callback(v, k, field);
-    }
-    return o;
-}
 
+function spmMapping(config) {
+    let matches = {};
+    for (let key in config) {
+        let v = config[key];
+        matches[v.type] = {
+            $sum: {
+                $cond: {
+                    if: {},
+                    then: 1,
+                    else: 0
+                }
+            }
+        };
+        //如果是从新定义匹配条件
+        if (v.reMatch !== false) {
+            //自己定义匹配条件
+            matches[v.type].$sum = v.reMatch;
+        } else {
+            let matchKey;
+            //如果统计数量
+            if (v.repeat === true) {
+                matchKey = "$type";
+            }
+            //如果是去重
+            else {
+                matchKey = "$_id.type";
+            }
+            matches[v.type].$sum.$cond.if = {
+                $eq: [matchKey, key]
+            }
+            //如果有额外的匹配需求
+            if (v.extMatch) {
+                matches[v.type].$sum.$cond.if = {
+                    $and: [
+                        matches[v.type].$sum.$cond.if,
+                        ...v.extMatch
+                    ]
+                }
+            }
+        }
+    }
+    return matches;
+}

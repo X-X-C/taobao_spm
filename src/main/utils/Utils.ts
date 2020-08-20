@@ -61,7 +61,7 @@ export default class Utils {
      * @param who  读取第几张表
      */
     static parseExcel(buffer, defineHeader: any = {}, who: number = 0) {
-        let data, workbook, header;
+        let data, workbook;
         workbook = xlsx.read(buffer, {
             type: "buffer"
         });

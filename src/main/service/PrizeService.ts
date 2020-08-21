@@ -12,16 +12,21 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
      * @param config
      */
     async exportsWinnerData(config) {
+        //获取页数
+        this.data.page = this.data.exportIndex + 1;
+        let rs = {
+            exportEnd: true,
+            outUrl: "没有相关数据"
+        }
         //配置
         let options: any = {
-            all: true,
             pureReturn: true,
             exportKey: true, //是否使用倒出数据的键
         }
         //获取中奖列表
         let data: any = await this.selectWinnerData(config, options);
-        if (data.length <= 0) {
-            return "没有相关数据";
+        if (data.list.length <= 0) {
+            return rs;
         }
         //获取表头
         let head = [];
@@ -31,7 +36,9 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         //将数据转换为excel buffer
         let buffer = Utils.jsonToExcelBuffer(data, {header: head});
         //上传文件,返回Url
-        return await this.uploadFile(buffer, "winners/" + this.time.x + ".xlsx");
+        rs.exportEnd = data.end;
+        rs.outUrl = await this.uploadFile(buffer, "winners/" + this.time.x + ".xlsx");
+        return rs;
     }
 
     /**
@@ -42,13 +49,12 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
     async selectWinnerData(config, ext = {}) {
         //配置
         let options = {
-            all: false, //是否返回所有匹配数据
             pureReturn: false,  //是否只返回纯净的数据数组
             exportKey: false, //是否使用倒出数据的键
             ...ext
         }
         //获取参数
-        let {activityId, currentPage, size, startTime, endTime, type, nick} = this.data;
+        let {activityId, currentPage, page, size, startTime, endTime, type, nick} = this.data;
         //初始化返回值
         let rs = {
             currentPage,
@@ -61,27 +67,24 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         //构建查询条件
         let filter: any = {
             "user.activityId": activityId,
+            type,
+            "user.nick": nick,
+            "time.base": {
+                $gte: startTime,
+                $lte: endTime
+            }
         }
-        //匹配对应的中奖类型
-        !type || (filter.type = type);
-        //匹配对应的用户
-        !nick || (filter["user.nick"] = nick);
-        //初始化时间查询
-        if (startTime || endTime) {
-            filter["time.base"] = {};
-            !startTime || (filter["time.base"].$gte = startTime);
-            !endTime || (filter["time.base"].$lte = endTime);
-        }
+        Utils.cleanObj(filter, true);
         let pipe: any = [
             {
                 $match: filter
             }
         ]
         //分页
-        if (currentPage && size && options.all === false) {
+        if ((currentPage || page) && size) {
             pipe.push(
                 {
-                    $skip: (currentPage - 1) * size
+                    $skip: ((currentPage || page) - 1) * size
                 },
                 {
                     $limit: size
@@ -117,13 +120,16 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
             $project: project
         });
         rs.list = await this.aggregate(pipe);
-        //如果只想返回数组
-        if (options.pureReturn === true) {
-            return rs.list;
-        }
         //总数
         rs.total = await this.count(filter);
         rs.pageTotal = Math.ceil(rs.total / size);
+        //如果只想返回数组
+        if (options.pureReturn === true) {
+            return {
+                list: rs.list,
+                end: page >= rs.pageTotal
+            }
+        }
         return rs;
     }
 }

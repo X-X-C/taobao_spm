@@ -100,7 +100,7 @@ export default class Utils {
      *     header: []
      * }
      */
-    static jsonToExcelBuffer(excelJson, ext = {}) {
+    static jsonToExcelBuffer(excelJson, ext: { header?: Array<any> } = {}) {
         //将json转换为xlsx的sheet格式
         let sheet = xlsx.utils.json_to_sheet(excelJson, ext);
         //新建一个xlsx工作薄
@@ -111,6 +111,26 @@ export default class Utils {
         //返回写出的工作簿buffer
         return xlsx.write(workbook, {type: "buffer"});
     }
+
+    /**
+     * 清除对象里的空白值
+     * @param obj
+     * @param deep
+     */
+    static cleanObj(obj, deep = false): boolean {
+        for (let key in obj) {
+            if (Utils.isBlank(obj[key])) {
+                delete obj[key];
+            }
+            //深清除
+            else if (typeof obj[key] === "object" && deep === true) {
+                Utils.cleanObj(obj[key], true);
+                Utils.cleanObj(obj);
+            }
+        }
+        return !Utils.isBlank(obj);
+    }
+
 
     /**
      * 抽奖

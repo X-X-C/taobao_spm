@@ -1,10 +1,80 @@
 import SpmDao from "../dao/SpmDao";
 import BaseService from "./abstract/BaseService";
 import Utils from "../utils/Utils";
+import Spm from "../entity/Spm";
 
 export default class SpmService extends BaseService<SpmDao, {}> {
     constructor(context) {
         super(new SpmDao(context));
+    }
+
+    /**
+     * 获取spm bean
+     * @param type
+     * @param data
+     */
+    bean(type, data: any = false): Spm {
+        let spm = new Spm();
+        spm.activityId = this.activityId;
+        spm.date = this.time.format("YYYY-MM-DD");
+        spm.nick = this.nick;
+        spm.type = type;
+        spm.data = data || this.data;
+        spm.openId = this.openId;
+        spm.time = this.time.base;
+        spm.timeStamp = this.time.x;
+        return spm;
+    }
+
+    /**
+     * 新增统计
+     * @param type
+     * @param data
+     */
+    async addSpm(type: string, data: any = false) {
+        let spm = this.bean(type, data);
+        await super.add(spm);
+    }
+
+    async spmCount() {
+        let filter = {
+            type: this.data.type,
+            activityId: this.data.activityId,
+            time: {
+                $gte: this.data.startTime,
+                $lte: this.data.endTime
+            }
+        }
+        Utils.cleanObj(filter, true);
+        return await this.count(filter);
+    }
+
+    async disUser() {
+        let filter = {
+            type: this.data.type,
+            activityId: this.data.activityId,
+            time: {
+                $gte: this.data.startTime,
+                $lte: this.data.endTime
+            }
+        }
+        Utils.cleanObj(filter, true);
+        let total = await this.aggregate([
+            {
+                $match: filter
+            },
+            {
+                $group: {
+                    _id: {
+                        openId: "$openId",
+                    }
+                }
+            },
+            {
+                $count: "count"
+            }
+        ]);
+        return total[0].count;
     }
 
     /**
@@ -14,14 +84,15 @@ export default class SpmService extends BaseService<SpmDao, {}> {
         let {activityId, startTime, endTime} = this.data;
         //查询条件
         let filter: any = {
-            activityId
+            activityId,
+            filter: {
+                time: {
+                    $gte: startTime,
+                    $lte: endTime
+                }
+            }
         };
-        //初始化时间查询
-        if (startTime || endTime) {
-            filter.timestr = {};
-            !startTime || (filter.timestr.$gte = startTime);
-            !endTime || (filter.timestr.$lte = endTime);
-        }
+        Utils.cleanObj(filter, true);
         let exportMapping: any = config.exportMapping;
         let count: any = spmMapping(config.count)
         let noRepeat: any = spmMapping(config.noRepeat);

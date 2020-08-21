@@ -1,8 +1,6 @@
 import App from "./src/main/App";
 import SpmService from "./src/main/service/SpmService";
 import BaseResult from "./src/main/dto/BaseResult";
-// @ts-ignore
-import * as gm from "gmtaobao";
 import PrizeService from "./src/main/service/PrizeService";
 import UserNickService from "./src/main/service/UserNickService";
 //请求成功是否返回参数
@@ -17,7 +15,6 @@ exports.main = async (context) => {
         // do...
     });
 }
-
 /**
  * 获取配置
  * @param context
@@ -40,7 +37,6 @@ exports.selectInfoByNick = async (context) => {
         // do...
     });
 }
-
 /**
  * 导出用户昵称
  * @param context
@@ -48,13 +44,12 @@ exports.selectInfoByNick = async (context) => {
 // @ts-ignore
 exports.exportUserNick = async (context) => {
     const app = new App(context, "exportUserNick");
+    let need = {
+        tb: ""
+    }
     return await app.run(async function () {
         let userNickService = new UserNickService(context, this.tb);
-        let url = await userNickService.exportUserNick();
-        return BaseResult.success("成功", {
-            outUrl: url
-        })
-    });
+    }, need);
 }
 
 /**
@@ -66,10 +61,8 @@ exports.exportWinnerData = async (context) => {
     const app = new App(context, "exportWinnerData");
     return await app.run(async function () {
         let prizeService = new PrizeService(context);
-        let url = await prizeService.exportsWinnerData(getSelectWinnersConfig());
-        return BaseResult.success("成功", {
-            outUrl: url
-        })
+        let rs = await prizeService.exportsWinnerData(getSelectWinnersConfig());
+        return BaseResult.success("成功", rs)
     });
 }
 
@@ -111,17 +104,28 @@ exports.spm = async (context) => {
     let need = {type: ""}
     return await app.run(async function () {
         let spmService = new SpmService(context);
-        await spmService.add(this.type);
+        await spmService.addSpm(this.type);
         return BaseResult.success();
     }, need);
 }
+
 // @ts-ignore
 exports.spmCount = async (context) => {
-    return await gm.spm.spmCount(context);
+    const app = new App(context, "spmCount");
+    return await app.run(async function () {
+        let spmService = new SpmService(context);
+        let total = await spmService.spmCount();
+        return BaseResult.success("成功", {total});
+    });
 };
 // @ts-ignore
 exports.disUser = async (context) => {
-    return await gm.spm.disUser(context);
+    const app = new App(context, "spmCount");
+    return await app.run(async function () {
+        let spmService = new SpmService(context);
+        let total = await spmService.disUser();
+        return BaseResult.success("成功", {total});
+    });
 };
 
 /**
@@ -135,6 +139,7 @@ function getSelectWinnersConfig() {
         //输出字段设置
         selConfig[v.type] = v.target;
         selConfig[v.type].exportKey = v.title;
+        selConfig[v.type].fileId = v.type;
     });
     return selConfig;
 }
@@ -218,9 +223,8 @@ function getConfig() {
             },
             "data": [  //奖品展示标题
                 {
-                    title: "领奖状态", type: "receiveStatus", target: {
-                        boolean: true,
-                        field: "$receiveStatus"
+                    title: "领奖状态", type: "$receiveStatus", target: {
+                        boolean: true
                     }
                 },
             ]
@@ -233,7 +237,9 @@ function getConfig() {
                     "title": "标题", //标题
                     "showTime": true,//是否需要时间查询
                     "fun": "exportWinnerData",//云函数方法名，自定义
-                    "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
+                    "fixParameter": {
+                        size: 20000
+                    },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {
                             "type": "radio", //单选框
@@ -259,11 +265,7 @@ function getConfig() {
                     "fun": "exportUserNick",//云函数方法名，自定义
                     "fixParameter": {
                         tb: "user",
-                        target: {
-                            field: "nick",
-                            timeField: "date",
-                            groupField: "id"
-                        }
+                        size: 20000
                     },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {

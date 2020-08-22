@@ -22,7 +22,7 @@ export default class SpmService extends BaseService<SpmDao, {}> {
         spm.data = data || this.data;
         spm.openId = this.openId;
         spm.time = this.time.base;
-        spm.timeStamp = this.time.x;
+        spm.timestamp = this.time.x;
         return spm;
     }
 

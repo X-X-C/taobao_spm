@@ -44,7 +44,7 @@ export default class SpmService extends BaseService<SpmDao, {}> {
                 $gte: this.data.startTime,
                 $lte: this.data.endTime
             },
-            ...this.data.selectConfig
+            ...this.data.selectExtMatch
         }
         Utils.cleanObj(filter, true);
         return await this.count(filter);
@@ -58,7 +58,7 @@ export default class SpmService extends BaseService<SpmDao, {}> {
                 $gte: this.data.startTime,
                 $lte: this.data.endTime
             },
-            ...this.data.selectConfig
+            ...this.data.selectExtMatch
         }
         Utils.cleanObj(filter, true);
         let total = await this.aggregate([
@@ -185,32 +185,32 @@ function spmMapping(config) {
             }
         };
         //如果是从新定义匹配条件
-        if (v.reMatch !== false) {
-            //自己定义匹配条件
-            matches[v.type].$sum = v.reMatch;
-        } else {
-            let matchKey;
-            //如果统计数量
-            if (v.repeat === true) {
-                matchKey = "$type";
-            }
-            //如果是去重
-            else {
-                matchKey = "$_id.type";
-            }
+        // if (v.reMatch !== false) {
+        //     //自己定义匹配条件
+        //     matches[v.type].$sum = v.reMatch;
+        // } else {
+        let matchKey;
+        //如果统计数量
+        if (v.repeat === true) {
+            matchKey = "$type";
+        }
+        //如果是去重
+        else {
+            matchKey = "$_id.type";
+        }
+        matches[v.type].$sum.$cond.if = {
+            $eq: [matchKey, key]
+        }
+        //如果有额外的匹配需求
+        if (v.extMatch) {
             matches[v.type].$sum.$cond.if = {
-                $eq: [matchKey, key]
-            }
-            //如果有额外的匹配需求
-            if (v.extMatch) {
-                matches[v.type].$sum.$cond.if = {
-                    $and: [
-                        matches[v.type].$sum.$cond.if,
-                        ...v.extMatch
-                    ]
-                }
+                $and: [
+                    matches[v.type].$sum.$cond.if,
+                    ...v.extMatch
+                ]
             }
         }
+        // }
     }
     return matches;
 }

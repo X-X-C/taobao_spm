@@ -43,7 +43,8 @@ export default class SpmService extends BaseService<SpmDao, {}> {
             time: {
                 $gte: this.data.startTime,
                 $lte: this.data.endTime
-            }
+            },
+            ...this.data.selectConfig
         }
         Utils.cleanObj(filter, true);
         return await this.count(filter);
@@ -56,7 +57,8 @@ export default class SpmService extends BaseService<SpmDao, {}> {
             time: {
                 $gte: this.data.startTime,
                 $lte: this.data.endTime
-            }
+            },
+            ...this.data.selectConfig
         }
         Utils.cleanObj(filter, true);
         let total = await this.aggregate([

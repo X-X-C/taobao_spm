@@ -162,8 +162,8 @@ function getExportStatisticsConfig() {
         let data = {
             type: v.type,
             exportKey: v.title,
-            extMatch: v.extMatch || false,
-            reMatch: v.reMatch || false,
+            extMatch: v.parameter.exportConfig.extMatch || false,
+            reMatch: v.parameter.exportConfig.reMatch || false,
             repeat: true
         }
         if (v.fun === "spmCount") {
@@ -187,7 +187,16 @@ function getConfig() {
             {
                 "title": "PV",
                 "type": "PV",
-                "parameter": {"type": "view"},
+                "parameter": {
+                    "type": "view",
+                    exportConfig: {
+                        "extMatch": [],
+                        "reMatch": {}
+                    },
+                    selectConfig: {
+                        "extMatch": {}
+                    }
+                },
                 "fun": "spmCount"
             },
             {

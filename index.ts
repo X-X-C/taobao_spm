@@ -2,7 +2,7 @@ import App from "./src/main/App";
 import SpmService from "./src/main/service/SpmService";
 import BaseResult from "./src/main/dto/BaseResult";
 import PrizeService from "./src/main/service/PrizeService";
-import UserNickService from "./src/main/service/UserNickService";
+import BaseDao from "./src/main/dao/abstract/BaseDao";
 //请求成功是否返回参数
 App.config.returnParams = true;
 //每次请求都必须要的参数
@@ -15,6 +15,22 @@ exports.main = async (context) => {
         // do...
     });
 }
+
+/**
+ * 后期检查数据
+ * @param context
+ */
+// @ts-ignore
+exports.aggregate = async (context) => {
+    const app = new App(context, "aggregate");
+    App.config.needParams = {};
+    let need = {tb: "", pipe: []};
+    return await app.run(async function () {
+        return await app.db(this.tb).aggregate(this.pipe);
+    }, need);
+}
+
+
 /**
  * 获取配置
  * @param context
@@ -34,7 +50,7 @@ exports.selectUiTitleAndType = async (context) => {
 exports.selectInfoByNick = async (context) => {
     const app = new App(context, "selectInfoByNick");
     return await app.run(async function () {
-        // do...
+        let baseDao = new BaseDao(context, this.tb);
     });
 }
 /**
@@ -44,12 +60,9 @@ exports.selectInfoByNick = async (context) => {
 // @ts-ignore
 exports.exportUserNick = async (context) => {
     const app = new App(context, "exportUserNick");
-    let need = {
-        tb: ""
-    }
     return await app.run(async function () {
-        let userNickService = new UserNickService(context, this.tb);
-    }, need);
+        let baseDao = new BaseDao(context, this.tb);
+    });
 }
 
 /**
@@ -131,15 +144,16 @@ exports.disUser = async (context) => {
 /**
  * 获取查询中奖信息配置
  */
-function getSelectWinnersConfig() {
-    let config: any = getConfig();
-    config = config.selectWinnerTitleAndTypeArr.data;
-    let selConfig: any = {};
-    config.forEach(v => {
+function getSelectWinnersConfig(config = getConfig().selectWinnerTitleAndTypeArr) {
+    let selConfig: any = {
+        config: {},
+        sort: config.sort
+    };
+    config.data.forEach(v => {
         //输出字段设置
-        selConfig[v.type] = v.target;
-        selConfig[v.type].exportKey = v.title;
-        selConfig[v.type].fileId = v.type;
+        selConfig.config[v.type] = v.target;
+        selConfig.config[v.type].fileId = v.type;
+        selConfig.config[v.type].exportKey = v.title;
     });
     return selConfig;
 }
@@ -163,7 +177,6 @@ function getExportStatisticsConfig() {
             type: v.type,
             exportKey: v.title,
             extMatch: v.parameter.exportExtMatch || false,
-            // reMatch: v.parameter.exportConfig.reMatch || false,
             repeat: true
         }
         if (v.fun === "spmCount") {
@@ -174,6 +187,23 @@ function getExportStatisticsConfig() {
         }
     });
     return exConfig;
+}
+
+function getCustomWinnerConfig() {
+    return {
+        //排序
+        sort: {
+            "$receiveStatus": -1,
+            "领奖状态": -1,
+        },
+        "data": [  //奖品展示标题
+            {
+                title: "领奖状态", type: "$receiveStatus", target: {
+                    boolean: true
+                }
+            },
+        ]
+    }
 }
 
 /**
@@ -224,6 +254,10 @@ function getConfig() {
                         },
                     ]
                 }
+            },
+            sort: {
+                "$receiveStatus": -1,
+                "领奖状态": -1,
             },
             "data": [  //奖品展示标题
                 {
@@ -288,28 +322,30 @@ function getConfig() {
         ],
         //用户ID查询
         "behaviorTitleAndTypeArr": [
-            // {
-            //     "title": "标题",
-            //     "export": {
-            //         "title": "标题", //标题
-            //         "showTime": true,//是否需要时间查询
-            //         "fun": "selectInfoByNick",//云函数方法名，自定义
-            //         "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
-            //         "parameter": {  //动态参数，比如 type:'type值1'
-            //             "type": {
-            //                 "type": "radio", //单选框
-            //                 "title": "类型标题",
-            //                 "options": [
-            //                     {
-            //                         "title": "所有",
-            //                         "value": "",
-            //                         "tb": "spm"
-            //                     }
-            //                 ]
-            //             }
-            //         }
-            //     }
-            // }
+            {
+                "title": "标题",
+                "export": {
+                    "title": "标题", //标题
+                    "showTime": true,//是否需要时间查询
+                    "fun": "selectInfoByNick",//云函数方法名，自定义
+                    "fixParameter": {
+                        tb: "spms"
+                    },//固定参数，查询接口时候会默认带上内部所有参数
+
+                    "parameter": {  //动态参数，比如 type:'type值1'
+                        "type": {
+                            "type": "radio", //单选框
+                            "title": "类型标题",
+                            "options": [
+                                {
+                                    "title": "所有",
+                                    "value": "",
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         ]
     }
 }

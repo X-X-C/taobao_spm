@@ -6,7 +6,6 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
     constructor(context) {
         super(new PrizeDao(context));
     }
-
     /**
      * 导出中奖数据
      * @param config
@@ -30,8 +29,8 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         }
         //获取表头
         let head = [];
-        for (let key in config) {
-            head.push(config[key].exportKey)
+        for (let key in config.config) {
+            head.push(config.config[key].exportKey)
         }
         //将数据转换为excel buffer
         let buffer = Utils.jsonToExcelBuffer(data, {header: head});
@@ -95,9 +94,10 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         let project = {
             _id: 0
         };
+        let selConfig = config.config;
         //获取字段
-        for (let key in config) {
-            let v = config[key];
+        for (let key in selConfig) {
+            let v = selConfig[key];
             //如果配置使用导出的key
             if (options.exportKey === true) {
                 key = v.exportKey;
@@ -116,9 +116,14 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
                 project[key] = v.field;
             }
         }
-        pipe.push({
-            $project: project
-        });
+        pipe.push(
+            {
+                $project: project
+            },
+            {
+                $sort: config.sort
+            }
+        );
         rs.list = await this.aggregate(pipe);
         //总数
         rs.total = await this.count(filter);

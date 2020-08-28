@@ -256,13 +256,13 @@ function getConfig() {
                 }
             },
             sort: {
-                "$receiveStatus": -1,
-                "领奖状态": -1,
+                "receiveStatus": -1,
             },
             "data": [  //奖品展示标题
                 {
-                    title: "领奖状态", type: "$receiveStatus", target: {
-                        boolean: true
+                    title: "领奖状态", type: "receiveStatus", target: {
+                        boolean: true,
+                        field: "$receiveStatus"
                     }
                 },
             ]

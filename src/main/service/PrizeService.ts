@@ -6,6 +6,7 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
     constructor(context) {
         super(new PrizeDao(context));
     }
+
     /**
      * 导出中奖数据
      * @param config
@@ -33,7 +34,7 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
             head.push(config.config[key].exportKey)
         }
         //将数据转换为excel buffer
-        let buffer = Utils.jsonToExcelBuffer(data, {header: head});
+        let buffer = Utils.jsonToExcelBuffer(data.list, {header: head});
         //上传文件,返回Url
         rs.exportEnd = data.end;
         rs.outUrl = await this.uploadFile(buffer, "winners/" + this.time.x + ".xlsx");
@@ -77,8 +78,13 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         let pipe: any = [
             {
                 $match: filter
-            }
+            },
         ]
+        if (Utils.cleanObj(config.sort)) {
+            pipe.push({
+                $sort: config.sort
+            });
+        }
         //分页
         if ((currentPage || page) && size) {
             pipe.push(
@@ -119,9 +125,6 @@ export default class PrizeService extends BaseService<PrizeDao, {}> {
         pipe.push(
             {
                 $project: project
-            },
-            {
-                $sort: config.sort
             }
         );
         rs.list = await this.aggregate(pipe);

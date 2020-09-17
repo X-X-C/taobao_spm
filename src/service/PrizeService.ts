@@ -3,11 +3,10 @@ import PrizeDao from "../dao/PrizeDao";
 import Utils from "../utils/Utils";
 import {obj} from "../utils/Type";
 
-export default class PrizeService extends BaseService<PrizeDao<obj>, obj> {
+export default class PrizeService extends BaseService<PrizeDao<any>, any> {
     constructor(context) {
         super(new PrizeDao(context));
     }
-
     /**
      * 导出中奖数据
      * @param config

@@ -1,7 +1,6 @@
 import BaseService from "./abstract/BaseService";
 import PrizeDao from "../dao/PrizeDao";
 import Utils from "../utils/Utils";
-import {obj} from "../utils/Type";
 
 export default class PrizeService extends BaseService<PrizeDao<any>, any> {
     constructor(context) {

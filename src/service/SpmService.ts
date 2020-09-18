@@ -2,7 +2,6 @@ import SpmDao from "../dao/SpmDao";
 import BaseService from "./abstract/BaseService";
 import Utils from "../utils/Utils";
 import Spm from "../entity/Spm";
-import {obj} from "../utils/Type";
 
 export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
     constructor(context) {
@@ -170,7 +169,7 @@ export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
 }
 
 
-function spmMapping(config): obj {
+function spmMapping(config): any {
     let matches = {};
     for (let key in config) {
         let v = config[key];

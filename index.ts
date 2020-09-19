@@ -6,7 +6,6 @@ import BaseDao from "./src/dao/abstract/BaseDao";
 App.config.returnParams = true;
 //每次请求都必须要的参数
 App.config.needParams = {};
-
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");

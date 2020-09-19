@@ -21,8 +21,8 @@ export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
         spm.type = type;
         spm.data = data || this.data;
         spm.openId = this.openId;
-        spm.time = this.time().base;
-        spm.timestamp = this.time().x;
+        spm.time = this.time().common.base;
+        spm.timestamp = this.time().common.x;
         return spm;
     }
 
@@ -164,7 +164,7 @@ export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
         }
         //拿到表格buffer
         let buffer = Utils.jsonToExcelBuffer(rs);
-        return await this.uploadFile(buffer, `day/${this.time().YYYYMMDD}.xlsx`)
+        return await this.uploadFile(buffer, `day/${this.time().common.YYYYMMDD}.xlsx`)
     }
 }
 

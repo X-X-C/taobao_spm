@@ -36,7 +36,7 @@ export default class PrizeService extends BaseService<PrizeDao<any>, any> {
         let buffer = Utils.jsonToExcelBuffer(data.list, {header: head});
         //上传文件,返回Url
         rs.exportEnd = data.end;
-        rs.outUrl = await this.uploadFile(buffer, "winners/" + this.time().x + ".xlsx");
+        rs.outUrl = await this.uploadFile(buffer, "winners/" + this.time().common.x + ".xlsx");
         return rs;
     }
 

@@ -5,7 +5,9 @@ import Utils from "../utils/Utils";
 export default class PrizeService extends BaseService<PrizeDao<any>, any> {
     constructor(context) {
         super(new PrizeDao(context));
+        return this.register(this);
     }
+
     /**
      * 导出中奖数据
      * @param config

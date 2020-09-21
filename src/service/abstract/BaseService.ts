@@ -3,6 +3,8 @@ import Time from "../../utils/Time";
 import Utils from "../../utils/Utils";
 import {result} from "../../utils/Type";
 
+let services = [];
+
 type listResult<T> = {
     data: T[];
     [other: string]: any;
@@ -39,6 +41,32 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
     protected time = (date: any = new Date()): Time => {
         return new Time(date);
     };
+
+    /**
+     * 实例化的service
+     * @param service
+     */
+    register(service) {
+        let s = services.find(v => v.constructor.name === service.constructor.name);
+        if (!s) {
+            s = service;
+            services.push(s);
+        }
+        return s;
+    }
+
+    /**
+     * 通过类获取service
+     * @param target
+     */
+    getService<C extends { [prop: string]: any }>(target: (new (...args) => C)): C {
+        let s = services.find(v => v.constructor.name === target.name);
+        if (s) {
+            return s;
+        }
+        //新实例注册到services
+        return new target(this.context);
+    }
 
     /**
      * 新增一条数据

@@ -103,10 +103,10 @@ export default class Utils {
      *     header: []
      * }
      */
-    static jsonToExcelBuffer(excelJson, ext: { header?: Array<any> } = {}): Buffer {
+    static jsonToExcelBuffer(excelJson, ext: { header?: Array<any> } = {}): any {
         //将json转换为xlsx的sheet格式
         let sheet = xlsx.utils.json_to_sheet(excelJson, ext);
-        sheet["!cols"] = (new Array(excelJson.length)).fill({ width: 15 });
+        sheet["!cols"] = (new Array(excelJson.length)).fill({width: 15});
         //新建一个xlsx工作薄
         let workbook = xlsx.utils.book_new();
         //将json的sheet添加到新的工作簿中
@@ -216,6 +216,7 @@ export default class Utils {
      * @param url
      */
     static qrImage(url): string {
+        // @ts-ignore
         return 'data:image/png;base64,' + Buffer.from(qr.imageSync(url), 'utf8').toString('base64');
     }
 }

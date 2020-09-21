@@ -149,7 +149,7 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
      * 从云端下载文件
      * @param fileId
      */
-    async downloadFile(fileId: string): Promise<Buffer> {
+    async downloadFile(fileId: string): Promise<any> {
         return await this.dao.downloadFile(fileId);
     }
 
@@ -158,7 +158,7 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
      * @param buffer
      * @param fileName
      */
-    async uploadFile(buffer: Buffer, fileName: string): Promise<string> {
+    async uploadFile(buffer: any, fileName: string): Promise<string> {
         return await this.dao.uploadFile(buffer, fileName);
     }
 }

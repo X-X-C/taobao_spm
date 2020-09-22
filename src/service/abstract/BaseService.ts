@@ -4,7 +4,6 @@ import Utils from "../../utils/Utils";
 import {result} from "../../utils/Type";
 
 let services = [];
-
 type listResult<T> = {
     data: T[];
     [other: string]: any;
@@ -41,6 +40,21 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
     protected time = (date: any = new Date()): Time => {
         return new Time(date);
     };
+
+
+    get result(): result {
+        return {
+            code: 0
+        }
+    }
+
+    get options() {
+        return {
+            $push: <E>{},
+            $set: <E>{},
+            $inc: <E>{}
+        }
+    }
 
     /**
      * 实例化的service
@@ -84,20 +98,6 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
         return await this.dao.insertMany(entity);
     }
 
-    getResult(): result {
-        return {
-            code: 0
-        }
-    }
-
-    getOptions() {
-        return {
-            $push: <E>{},
-            $set: <E>{},
-            $inc: <E>{}
-        }
-    }
-
     /**
      * 编辑
      * @param filter
@@ -126,7 +126,7 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
         return await this.dao.count(filter);
     }
 
-    async aggregate(pipe: Array<object>): Promise<any[]> {
+    async aggregate(pipe: Array<any>): Promise<any[]> {
         return await this.dao.aggregate(pipe);
     }
 

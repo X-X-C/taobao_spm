@@ -165,20 +165,18 @@ function getExportStatisticsConfig() {
         exportMapping: {}
     };
     config.forEach((v) => {
-        if (!v.parameter.extMatch) {
-            let type = v.parameter.type;
-            exConfig.exportMapping[v.type] = v.title;
-            let data = {
-                type,
-                exportKey: v.title,
-                repeat: true
-            }
-            if (v.fun === "spmCount") {
-                exConfig.count[v.type] = data
-            } else if (v.fun === "disUser") {
-                data.repeat = false;
-                exConfig.noRepeat[v.type] = data
-            }
+        let type = v.parameter.type;
+        exConfig.exportMapping[v.type] = v.title;
+        let data = {
+            type,
+            exportKey: v.title,
+            repeat: true
+        }
+        if (v.fun === "spmCount") {
+            exConfig.count[v.type] = data
+        } else if (v.fun === "disUser") {
+            data.repeat = false;
+            exConfig.noRepeat[v.type] = data
         }
     });
     return exConfig;

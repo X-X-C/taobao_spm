@@ -81,7 +81,46 @@ export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
         } catch (e) {
             return 0;
         }
+    }
 
+
+    async newUser() {
+        let filter = {
+            type: this.data.type,
+            activityId: this.data.activityId,
+            ...this.data.extMatch
+        }
+        Utils.cleanObj(filter, true);
+        let pipe = [
+            {
+                $match: filter
+            },
+            {
+                $group: {
+                    _id: "$openId",
+                    time: {
+                        $min: "$time"
+                    }
+                }
+            },
+            {
+                $match: {
+                    time: {
+                        $gte: this.data.startTime,
+                        $lte: this.data.endTime
+                    },
+                }
+            },
+            {
+                $count: "count"
+            }
+        ]
+        let total = await this.aggregate(pipe);
+        try {
+            return total[0].count;
+        } catch (e) {
+            return 0;
+        }
     }
 
     /**

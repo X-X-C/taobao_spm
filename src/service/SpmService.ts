@@ -76,7 +76,12 @@ export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
                 $count: "count"
             }
         ]);
-        return total[0].count;
+        try {
+            return total[0].count;
+        } catch (e) {
+            return 0;
+        }
+
     }
 
     /**

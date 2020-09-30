@@ -83,7 +83,6 @@ export default class SpmService extends BaseService<SpmDao<Spm>, Spm> {
         }
     }
 
-
     async newUser() {
         let filter = {
             type: this.data.type,

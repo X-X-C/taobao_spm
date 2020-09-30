@@ -35,8 +35,11 @@ exports.aggregate = async (context) => {
  */
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
-    let data = getConfig();
-    return {data};
+    const app = new App(context, "selectUiTitleAndType");
+    return await app.run(async function () {
+        return getConfig();
+    });
+
 };
 
 
@@ -127,10 +130,20 @@ exports.spmCount = async (context) => {
 };
 // @ts-ignore
 exports.disUser = async (context) => {
-    const app = new App(context, "spmCount");
+    const app = new App(context, "disUser");
     return await app.run(async function () {
         let spmService = new SpmService(context);
         let total = await spmService.disUser();
+        return {total};
+    });
+};
+
+// @ts-ignore
+exports.newUser = async (context) => {
+    const app = new App(context, "newUser");
+    return await app.run(async function () {
+        let spmService = new SpmService(context);
+        let total = await spmService.newUser();
         return {total};
     });
 };

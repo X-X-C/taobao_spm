@@ -2,10 +2,6 @@ import App from "./src/App";
 import SpmService from "./src/service/SpmService";
 import PrizeService from "./src/service/PrizeService";
 import BaseDao from "./src/dao/abstract/BaseDao";
-//请求成功是否返回参数
-App.config.returnParams = true;
-//每次请求都必须要的参数
-App.config.needParams = {};
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");
@@ -21,7 +17,7 @@ exports.main = async (context) => {
 // @ts-ignore
 exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");
-    App.config.needParams = {};
+    app.config.needParams = {};
     let need = {tb: "", pipe: []};
     return await app.run(async function () {
         return await app.db(this.tb).aggregate(this.pipe);

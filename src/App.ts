@@ -7,13 +7,16 @@ export default class App {
     }
 
     //APP配置
-    static config = {
+    config = {
         //是否在请求结束后返回本次请求参数
-        returnParams: false,
+        returnParams: true,
         needParams: {}
     }
+
     //异常后的操作
-    static errorDo: Function = (e) => {
+    async errorDo(response) {
+        let errorLogService = new ErrorLogService(this.context)
+        await errorLogService.add(response);
     }
 
     /**
@@ -30,7 +33,7 @@ export default class App {
         let result = null;
         try {
             //全局所需参数
-            Object.assign(needParams, App.config.needParams);
+            Object.assign(needParams, this.config.needParams);
             //判断参数是否符合条件
             result = Utils.checkParams(needParams, params);
             //如果不符合条件直接返回
@@ -54,7 +57,7 @@ export default class App {
             Object.assign(response, {params})
             try {
                 //用户自行对异常对象进行操作
-                await App.errorDo.call(this, response);
+                await this.errorDo(response);
             } catch (e) {
                 //...
             }
@@ -62,7 +65,7 @@ export default class App {
             return response;
         }
         //成功过后是否返回请求参数
-        if (App.config.returnParams === true) {
+        if (this.config.returnParams === true) {
             Object.assign(response, {params})
         }
         return response;
@@ -90,11 +93,3 @@ export default class App {
         return this.context.cloud.db.collection(tb);
     }
 }
-
-
-App.errorDo = async function (response) {
-    let errorLogService = new ErrorLogService(this.context)
-    await errorLogService.add(response);
-}
-//请求成功是否返回参数
-App.config.returnParams = true;

@@ -307,12 +307,7 @@ function getConfig() {
                         "type": {
                             "type": "radio", //单选框
                             "title": "类型标题",
-                            "options": [
-                                {
-                                    "title": "全部",
-                                    "value": ""
-                                }
-                            ]
+                            "options": []
                         }
                     }
                 }
@@ -334,12 +329,7 @@ function getConfig() {
                         "type": {
                             "type": "radio", //单选框
                             "title": "类型标题",
-                            "options": [
-                                {
-                                    "title": "所有",
-                                    "value": "",
-                                }
-                            ]
+                            "options": []
                         }
                     }
                 }

@@ -49,6 +49,7 @@ exports.selectInfoByNick = async (context) => {
     const app = new App(context, "selectInfoByNick");
     return await app.run(async function () {
         let baseDao = new BaseDao(context, this.tb);
+        let list = [];
         let rs = {
             "behaviorList": [
                 {
@@ -69,7 +70,7 @@ exports.selectInfoByNick = async (context) => {
         Utils.cleanObj(filter);
         if (this.type === "assistAll") {
             filter["data.inviter.nick"] = this.nick;
-            let list = await baseDao.aggregate([
+            list = await baseDao.aggregate([
                 {
                     $match: filter
                 },
@@ -92,8 +93,8 @@ exports.selectInfoByNick = async (context) => {
             list = list.map(v => {
                 return `【${v.inviterNick}】在【${v.time}】邀请【${v.userNick}-${v.openId}】,${v.msg || "邀请成功"}`;
             });
-            rs.behaviorList[0].behaviorInformationArr = list;
         }
+        rs.behaviorList[0].behaviorInformationArr = list;
         return rs;
     });
 }

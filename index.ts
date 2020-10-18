@@ -36,7 +36,6 @@ exports.selectUiTitleAndType = async (context) => {
     return await app.run(async function () {
         return getConfig();
     });
-
 };
 
 
@@ -241,23 +240,6 @@ function getExportStatisticsConfig() {
         }
     });
     return exConfig;
-}
-
-function getCustomWinnerConfig() {
-    return {
-        //排序
-        sort: {
-            "receiveStatus": -1,
-        },
-        "data": [  //奖品展示标题
-            {
-                title: "领奖状态", type: "receiveStatus", target: {
-                    boolean: true,
-                    field: "$receiveStatus"
-                }
-            },
-        ]
-    }
 }
 
 /**

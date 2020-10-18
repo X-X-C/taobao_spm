@@ -2,6 +2,7 @@ import App from "./src/App";
 import SpmService from "./src/service/SpmService";
 import PrizeService from "./src/service/PrizeService";
 import BaseDao from "./src/dao/abstract/BaseDao";
+import Utils from "./src/utils/Utils";
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");
@@ -48,6 +49,52 @@ exports.selectInfoByNick = async (context) => {
     const app = new App(context, "selectInfoByNick");
     return await app.run(async function () {
         let baseDao = new BaseDao(context, this.tb);
+        let rs = {
+            "behaviorList": [
+                {
+                    "behaviorInformationArr": [],
+                    "title": this.type,
+                    "type": this.type
+                }
+            ]
+        }
+        let filter: any = {
+            activityId: this.activityId,
+            time: {
+                $gte: this.startTime,
+                $lte: this.endTime
+            },
+            type: this.type,
+        }
+        Utils.cleanObj(filter);
+        if (this.type === "assistAll") {
+            filter["data.inviter.nick"] = this.nick;
+            let list = await baseDao.aggregate([
+                {
+                    $match: filter
+                },
+                {
+                    $sort: {
+                        time: -1
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        userNick: "$data.user.nick",
+                        inviterNick: "$data.inviter.nick",
+                        openId: "$data.user.openId",
+                        msg: "$data.message",
+                        time: 1
+                    }
+                }
+            ]);
+            list = list.map(v => {
+                return `【${v.inviterNick}】在【${v.time}】邀请【${v.userNick}-${v.openId}】,${v.msg || "邀请成功"}`;
+            });
+            rs.behaviorList[0].behaviorInformationArr = list;
+        }
+        return rs;
     });
 }
 /**
@@ -59,6 +106,10 @@ exports.exportUserNick = async (context) => {
     const app = new App(context, "exportUserNick");
     return await app.run(async function () {
         let baseDao = new BaseDao(context, this.tb);
+        let url = "没有数据";
+        return {
+            outUrl: url
+        }
     });
 }
 
@@ -248,15 +299,51 @@ function getConfig() {
                     "options": [
                         {
                             "title": "所有类型",
-                            "value": ""
+                            "value": "lottery"
                         },
                     ]
                 }
             },
             sort: {
-                "receiveStatus": -1,
+                "time.common": -1,
             },
             "data": [  //奖品展示标题
+                {
+                    title: "ID", type: "nick", target: {
+                        boolean: true,
+                        field: "$receiveStatus"
+                    }
+                },
+                {
+                    title: "姓名", type: "name", target: {
+                        field: "$ext.name"
+                    }
+                },
+                {
+                    title: "电话", type: "tel", target: {
+                        field: "$ext.tel"
+                    }
+                },
+                {
+                    title: "省", type: "province", target: {
+                        field: "$ext.province"
+                    }
+                },
+                {
+                    title: "市", type: "city", target: {
+                        field: "$ext.city"
+                    }
+                },
+                {
+                    title: "区", type: "district", target: {
+                        field: "$ext.district"
+                    }
+                },
+                {
+                    title: "详细地址", type: "desc", target: {
+                        field: "$ext.desc"
+                    }
+                },
                 {
                     title: "领奖状态", type: "receiveStatus", target: {
                         boolean: true,
@@ -268,9 +355,9 @@ function getConfig() {
         //中奖数据导出
         "winnerTitleAndTypeArr": [
             {
-                "title": "标题",
+                "title": "中奖数据",
                 "export": {
-                    "title": "标题", //标题
+                    "title": "类型", //标题
                     "showTime": true,//是否需要时间查询
                     "fun": "exportWinnerData",//云函数方法名，自定义
                     "fixParameter": {
@@ -282,9 +369,13 @@ function getConfig() {
                             "title": "类型标题",
                             "options": [
                                 {
-                                    "title": "所有类型",
-                                    "value": ""
-                                }
+                                    "title": "抽奖",
+                                    "value": "lottery"
+                                },
+                                {
+                                    "title": "排行榜",
+                                    "value": "rank"
+                                },
                             ]
                         }
                     }
@@ -316,20 +407,24 @@ function getConfig() {
         //用户ID查询
         "behaviorTitleAndTypeArr": [
             {
-                "title": "标题",
+                "title": "行为数据",
                 "export": {
-                    "title": "标题", //标题
+                    "title": "类型", //标题
                     "showTime": true,//是否需要时间查询
                     "fun": "selectInfoByNick",//云函数方法名，自定义
                     "fixParameter": {
                         tb: "spms"
                     },//固定参数，查询接口时候会默认带上内部所有参数
-
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {
                             "type": "radio", //单选框
                             "title": "类型标题",
-                            "options": []
+                            "options": [
+                                {
+                                    "title": "邀请明细",
+                                    "value": "assistAll"
+                                }
+                            ]
                         }
                     }
                 }

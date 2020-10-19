@@ -18,10 +18,52 @@ exports.main = async (context) => {
 // @ts-ignore
 exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");
-    app.config.needParams = {};
-    let need = {tb: "", pipe: []};
+    let need = {
+        tb: "",
+        pipe: []
+    };
     return await app.run(async function () {
         return await app.db(this.tb).aggregate(this.pipe);
+    }, need);
+}
+
+/**
+ * 后期修改数据
+ * @param context
+ */
+// @ts-ignore
+exports.update = async (context) => {
+    const app = new App(context, "update");
+    let need = {
+        tb: "",
+        filter: {},
+        options: {}
+    }
+    return await app.run(async function () {
+        if (this.ok === true) {
+            return await app.db(this.tb).updateMany(this.filter, this.options);
+        }
+    }, need);
+}
+
+/**
+ * 后期修改数据
+ * @param context
+ */
+// @ts-ignore
+exports.clean = async (context) => {
+    const app = new App(context, "clean");
+    let need = {
+        tb: ""
+    }
+    return await app.run(async function () {
+        if (this.ok === true) {
+            return await app.db(this.tb).deleteMany({
+                _id: {
+                    $ne: 0
+                }
+            });
+        }
     }, need);
 }
 

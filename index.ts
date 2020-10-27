@@ -18,10 +18,7 @@ exports.main = async (context) => {
 // @ts-ignore
 exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");
-    let need = {
-        tb: "",
-        pipe: []
-    };
+    let need = ["tb", "pipe"];
     return await app.run(async function () {
         return await app.db(this.tb).aggregate(this.pipe);
     }, need);
@@ -34,11 +31,7 @@ exports.aggregate = async (context) => {
 // @ts-ignore
 exports.update = async (context) => {
     const app = new App(context, "update");
-    let need = {
-        tb: "",
-        filter: {},
-        options: {}
-    }
+    let need = ["tb", "filter", "options"];
     return await app.run(async function () {
         if (this.ok === true) {
             return await app.db(this.tb).updateMany(this.filter, this.options);
@@ -53,9 +46,6 @@ exports.update = async (context) => {
 // @ts-ignore
 exports.clean = async (context) => {
     const app = new App(context, "clean");
-    let need = {
-        tb: ""
-    }
     return await app.run(async function () {
         if (this.ok === true) {
             return await app.db(this.tb).deleteMany({
@@ -64,7 +54,7 @@ exports.clean = async (context) => {
                 }
             });
         }
-    }, need);
+    }, ["tb"]);
 }
 
 
@@ -186,9 +176,7 @@ exports.selectWinnerData = async (context) => {
 // @ts-ignore
 exports.exportStatistics = async (context) => {
     const app = new App(context, "exportStatistics");
-    let need = {
-        activityId: "",
-    }
+    let need = ["activityId"]
     return await app.run(async function () {
         let spmService = new SpmService(context);
         let url = await spmService.exportStatistics(getExportStatisticsConfig())
@@ -201,11 +189,10 @@ exports.exportStatistics = async (context) => {
 // @ts-ignore
 exports.spm = async (context) => {
     const app = new App(context, "spm");
-    let need = {type: ""}
     return await app.run(async function () {
         let spmService = new SpmService(context);
         await spmService.addSpm(this.type);
-    }, need);
+    }, ["type"]);
 }
 
 // @ts-ignore

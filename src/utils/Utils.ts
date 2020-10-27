@@ -9,19 +9,23 @@ import * as qr from "qr-image";
 export default class Utils {
     /**
      * 判断参数是否正确
-     * @param need  { name: "示例" }
-     * @param real  { name: "小白" }
-     * @return BaseResult
      */
-    static checkParams(need: any, real: any): BaseResult {
-        for (let key in need) {
-            if (typeof real[key] === "undefined") {
-                return BaseResult.fail(`缺少参数${key}`);
-            } else if (typeof real[key] !== typeof need[key]) {
-                return BaseResult.fail(`参数类型错误${key}`);
-            }
+    static checkParams(need: any[], real: object): {
+        success: boolean,
+        message: string
+    } {
+        let rs = {
+            success: false,
+            message: ""
         }
-        return BaseResult.success();
+        let keys = Object.keys(real);
+        rs.success = need.every(v => {
+            if (keys.indexOf(v) !== -1) {
+                return true;
+            }
+            rs.message += "缺少参数" + v;
+        });
+        return rs;
     }
 
     /**
@@ -68,31 +72,27 @@ export default class Utils {
         //读取表的数据
         data = workbook.Sheets[workbook.SheetNames[who]];
         data = xlsx.utils.sheet_to_json(data);
-        try {
-            let header = true;
-            //映射对应的键
-            data = data.map(v => {
-                let o = {};
-                for (let key in defineHeader) {
-                    let targetKey = defineHeader[key];
-                    //如果是表头
-                    if (header === true) {
-                        //如果表头中没有对应的键
-                        if (typeof v[targetKey] === "undefined") {
-                            throw "缺少字段" + targetKey
-                        }
+        let header = true;
+        //映射对应的键
+        data = data.map(v => {
+            let o = {};
+            for (let key in defineHeader) {
+                let targetKey = defineHeader[key];
+                //如果是表头
+                if (header === true) {
+                    //如果表头中没有对应的键
+                    if (typeof v[targetKey] === "undefined") {
+                        throw "表格缺少字段" + targetKey
                     }
-                    if (typeof v[targetKey] === "number") {
-                        v[targetKey] = String(v[targetKey]);
-                    }
-                    o[key] = v[targetKey];
                 }
-                header = false;
-                return o;
-            });
-        } catch (e) {
-            return false;
-        }
+                if (typeof v[targetKey] === "number") {
+                    v[targetKey] = String(v[targetKey]);
+                }
+                o[key] = v[targetKey];
+            }
+            header = false;
+            return o;
+        });
         return data;
     }
 
@@ -106,7 +106,6 @@ export default class Utils {
     static jsonToExcelBuffer(excelJson, ext: { header?: Array<any> } = {}): any {
         //将json转换为xlsx的sheet格式
         let sheet = xlsx.utils.json_to_sheet(excelJson, ext);
-        sheet["!cols"] = (new Array(excelJson.length)).fill({width: 15});
         //新建一个xlsx工作薄
         let workbook = xlsx.utils.book_new();
         //将json的sheet添加到新的工作簿中
@@ -144,6 +143,14 @@ export default class Utils {
             unique += source[Math.floor(Math.random() * source.length)];
         }
         return unique;
+    }
+
+    static type = {
+        number: Utils.getType(1),
+        object: Utils.getType({}),
+        array: Utils.getType([]),
+        string: Utils.getType(""),
+        boolean: Utils.getType(true),
     }
 
     /**
@@ -218,5 +225,9 @@ export default class Utils {
     static qrImage(url): string {
         // @ts-ignore
         return 'data:image/png;base64,' + Buffer.from(qr.imageSync(url), 'utf8').toString('base64');
+    }
+
+    static deepClone<T>(obj: T): T {
+        return JSON.parse(JSON.stringify(obj));
     }
 }

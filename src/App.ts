@@ -53,6 +53,7 @@ export default class App {
             //发现异常 初始化返回参数
             response = BaseResult.fail(e.message, e);
             response.api = this.apiName;
+            response.params = params;
             try {
                 let errorLogService = new ErrorLogService(this.context);
                 await errorLogService.add(response);

@@ -322,8 +322,7 @@ function getConfig() {
             "data": [  //奖品展示标题
                 {
                     title: "ID", type: "nick", target: {
-                        boolean: true,
-                        field: "$receiveStatus"
+                        field: "$user.nick"
                     }
                 },
                 {

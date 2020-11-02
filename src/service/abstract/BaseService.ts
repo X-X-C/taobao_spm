@@ -8,12 +8,6 @@ type listResult<T> = {
     [other: string]: any;
 }
 
-type listOptions = {
-    skip?: number,
-    limit?: number,
-    [other: string]: any
-}
-
 export default abstract class BaseService<T extends BaseDao<E>, E extends object> {
     protected constructor(Dao: T) {
         this.dao = Dao;

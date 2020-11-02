@@ -111,7 +111,10 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
      * @param options
      * @param dividePage    是否分页
      */
-    async list(filter: any = {}, options: listOptions = {}, dividePage: boolean = true): Promise<listResult<E>> {
+    async list(filter: any = {}, options: listOptions = {
+        skip: 0,
+        limit: 100
+    }, dividePage: boolean = true): Promise<listResult<E>> {
         let rs: listResult<E> = {
             data: null
         };
@@ -124,7 +127,17 @@ export default abstract class BaseService<T extends BaseDao<E>, E extends object
                 rs.total = Math.ceil(count / size);
             }
         }
-        rs.data = await this.dao.find(filter, options);
+        rs.data = await this.dao.aggregate([
+            {
+                $match: filter
+            },
+            {
+                $skip: options.skip
+            },
+            {
+                $limit: options.limit
+            }
+        ]);
         return rs;
     }
 

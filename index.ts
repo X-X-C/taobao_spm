@@ -153,7 +153,7 @@ exports.exportUserNick = async (context) => {
 exports.exportWinnerData = async (context) => {
     const app = new App(context, "exportWinnerData");
     return await app.run(async function () {
-        let prizeService = new PrizeService(context);
+        let prizeService = new PrizeService(app);
         return await prizeService.exportsWinnerData(getSelectWinnersConfig());
     });
 }
@@ -165,7 +165,7 @@ exports.exportWinnerData = async (context) => {
 exports.selectWinnerData = async (context) => {
     const app = new App(context, "selectWinnerData");
     return await app.run(async function () {
-        let prizeService = new PrizeService(context);
+        let prizeService = new PrizeService(app);
         return await prizeService.selectWinnerData(getSelectWinnersConfig());
     });
 }
@@ -178,7 +178,7 @@ exports.exportStatistics = async (context) => {
     const app = new App(context, "exportStatistics");
     let need = ["activityId"]
     return await app.run(async function () {
-        let spmService = new SpmService(context);
+        let spmService = new SpmService(app);
         let url = await spmService.exportStatistics(getExportStatisticsConfig())
         return {
             outUrl: url
@@ -190,7 +190,7 @@ exports.exportStatistics = async (context) => {
 exports.spm = async (context) => {
     const app = new App(context, "spm");
     return await app.run(async function () {
-        let spmService = new SpmService(context);
+        let spmService = new SpmService(app);
         await spmService.addSpm(this.type);
     }, ["type"]);
 }
@@ -199,7 +199,7 @@ exports.spm = async (context) => {
 exports.spmCount = async (context) => {
     const app = new App(context, "spmCount");
     return await app.run(async function () {
-        let spmService = new SpmService(context);
+        let spmService = new SpmService(app);
         let total = await spmService.spmCount();
         return {total};
     });
@@ -208,7 +208,7 @@ exports.spmCount = async (context) => {
 exports.disUser = async (context) => {
     const app = new App(context, "disUser");
     return await app.run(async function () {
-        let spmService = new SpmService(context);
+        let spmService = new SpmService(app);
         let total = await spmService.disUser();
         return {total};
     });
@@ -218,7 +218,7 @@ exports.disUser = async (context) => {
 exports.newUser = async (context) => {
     const app = new App(context, "newUser");
     return await app.run(async function () {
-        let spmService = new SpmService(context);
+        let spmService = new SpmService(app);
         let total = await spmService.newUser();
         return {total};
     });

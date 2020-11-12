@@ -67,9 +67,9 @@ export default class PrizeService extends BaseService<PrizeDao<any>, any> {
         }
         //构建查询条件
         let filter: any = {
-            "user.activityId": activityId,
+            "activityId": activityId,
             type,
-            "user.nick": nick,
+            "nick": nick,
             "time.base": {
                 $gte: startTime,
                 $lte: endTime

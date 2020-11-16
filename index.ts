@@ -54,7 +54,8 @@ function getConfig() {
                 },
                 filter: {
                     //额外查询
-                }
+                },
+                winnerTitleAndTypeArr: prizeConfig()
             },//固定参数，查询接口时候会默认带上内部所有参数
             "parameter": {  //动态参数，比如 type:'type值1'
                 "type": {
@@ -68,29 +69,7 @@ function getConfig() {
                     ]
                 }
             },
-            "data": [  //奖品展示标题
-                {
-                    title: "ID", type: "nick", targetField: "nick"
-                },
-                {
-                    title: "姓名", type: "name", targetField: "ext.name"
-                },
-                {
-                    title: "电话", type: "tel", targetField: "ext.tel"
-                },
-                {
-                    title: "省", type: "province", targetField: "ext.province"
-                },
-                {
-                    title: "市", type: "city", targetField: "ext.city"
-                },
-                {
-                    title: "区", type: "district", targetField: "ext.district"
-                },
-                {
-                    title: "详细地址", type: "desc", targetField: "ext.desc"
-                }
-            ]
+            "data": prizeConfig()
         },
         //中奖数据导出
         "winnerTitleAndTypeArr": [
@@ -107,7 +86,8 @@ function getConfig() {
                         },
                         filter: {
                             //额外查询
-                        }
+                        },
+                        winnerTitleAndTypeArr: prizeConfig()
                     },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {
@@ -181,6 +161,33 @@ function getConfig() {
             }
         ]
     }
+}
+
+function prizeConfig() {
+    return [  //奖品展示标题
+        {
+            title: "ID", type: "nick", targetField: "nick"
+        },
+        {
+            title: "姓名", type: "name", targetField: "ext.name"
+        },
+        {
+            title: "电话", type: "tel", targetField: "ext.tel"
+        },
+        {
+            title: "省", type: "province", targetField: "ext.province"
+        },
+        {
+            title: "市", type: "city", targetField: "ext.city"
+        },
+        {
+            title: "区", type: "district", targetField: "ext.district"
+        },
+        {
+            title: "详细地址", type: "desc", targetField: "ext.desc"
+        }
+    ]
+
 }
 
 /**

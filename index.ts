@@ -46,8 +46,15 @@ function getConfig() {
         "selectWinnerTitleAndTypeArr": {
             "title": "中奖数据查询", //标题
             "showTime": true,//是否需要时间查询
-            "fun": "selectWinnerData",//云函数方法名，自定义
-            "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
+            "fun": "selectPrize",//云函数方法名，自定义
+            "fixParameter": {
+                sort: {
+                    //排序
+                },
+                filter: {
+                    //额外查询
+                }
+            },//固定参数，查询接口时候会默认带上内部所有参数
             "parameter": {  //动态参数，比如 type:'type值1'
                 "type": {
                     "type": "radio", //单选框
@@ -60,51 +67,28 @@ function getConfig() {
                     ]
                 }
             },
-            sort: {
-                "time.common": -1,
-            },
             "data": [  //奖品展示标题
                 {
-                    title: "ID", type: "nick", target: {
-                        field: "$user.nick"
-                    }
+                    title: "ID", type: "nick"
                 },
                 {
-                    title: "姓名", type: "name", target: {
-                        field: "$ext.name"
-                    }
+                    title: "姓名", type: "name"
                 },
                 {
-                    title: "电话", type: "tel", target: {
-                        field: "$ext.tel"
-                    }
+                    title: "电话", type: "tel"
                 },
                 {
-                    title: "省", type: "province", target: {
-                        field: "$ext.province"
-                    }
+                    title: "省", type: "province"
                 },
                 {
-                    title: "市", type: "city", target: {
-                        field: "$ext.city"
-                    }
+                    title: "市", type: "city"
                 },
                 {
-                    title: "区", type: "district", target: {
-                        field: "$ext.district"
-                    }
+                    title: "区", type: "district"
                 },
                 {
-                    title: "详细地址", type: "desc", target: {
-                        field: "$ext.desc"
-                    }
-                },
-                {
-                    title: "领奖状态", type: "receiveStatus", target: {
-                        boolean: true,
-                        field: "$receiveStatus"
-                    }
-                },
+                    title: "详细地址", type: "desc"
+                }
             ]
         },
         //中奖数据导出
@@ -114,9 +98,14 @@ function getConfig() {
                 "export": {
                     "title": "类型", //标题
                     "showTime": true,//是否需要时间查询
-                    "fun": "exportWinnerData",//云函数方法名，自定义
+                    "fun": "exportsPrize",//云函数方法名，自定义
                     "fixParameter": {
-                        size: 20000
+                        sort: {
+                            //排序
+                        },
+                        filter: {
+                            //额外查询
+                        }
                     },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {
@@ -144,16 +133,22 @@ function getConfig() {
                 "export": {
                     "title": "标题", //标题
                     "showTime": true,//是否需要时间查询
-                    "fun": "exportUserNick",//云函数方法名，自定义
+                    "fun": "exportsNick",//云函数方法名，自定义
                     "fixParameter": {
-                        tb: "user",
-                        size: 20000
+                        filter: {
+                            //额外查询
+                        }
                     },//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {
                             "type": "radio", //单选框
                             "title": "类型标题",
-                            "options": []
+                            "options": [
+                                {
+                                    "title": "助力",
+                                    "value": "assist"
+                                },
+                            ]
                         }
                     }
                 }
@@ -166,10 +161,8 @@ function getConfig() {
                 "export": {
                     "title": "类型", //标题
                     "showTime": true,//是否需要时间查询
-                    "fun": "selectInfoByNick",//云函数方法名，自定义
-                    "fixParameter": {
-                        tb: "spms"
-                    },//固定参数，查询接口时候会默认带上内部所有参数
+                    "fun": "selectBehavior",//云函数方法名，自定义
+                    "fixParameter": {},//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
                         "type": {
                             "type": "radio", //单选框

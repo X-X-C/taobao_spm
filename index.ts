@@ -1,274 +1,12 @@
-import PrizeService from "./src/service/PrizeService";
 import App from "./base/App";
-import BaseDao from "./base/dao/abstract/BaseDao";
-import Utils from "./base/utils/Utils";
-import SpmService from "./src/service/SpmService";
+// @ts-ignore
+import * as gmspm from "gm-spm";
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");
     return await app.run(async function () {
         // do...
     });
-}
-
-/**
- * 后期检查数据
- * @param context
- */
-// @ts-ignore
-exports.aggregate = async (context) => {
-    const app = new App(context, "aggregate");
-    let need = ["tb", "pipe"];
-    return await app.run(async function () {
-        return await app.db(this.tb).aggregate(this.pipe);
-    }, need);
-}
-
-/**
- * 后期修改数据
- * @param context
- */
-// @ts-ignore
-exports.update = async (context) => {
-    const app = new App(context, "update");
-    let need = ["tb", "filter", "options"];
-    return await app.run(async function () {
-        if (this.ok === true) {
-            return await app.db(this.tb).updateMany(this.filter, this.options);
-        }
-    }, need);
-}
-
-/**
- * 后期修改数据
- * @param context
- */
-// @ts-ignore
-exports.clean = async (context) => {
-    const app = new App(context, "clean");
-    return await app.run(async function () {
-        if (this.ok === true) {
-            return await app.db(this.tb).deleteMany({
-                _id: {
-                    $ne: 0
-                }
-            });
-        }
-    }, ["tb"]);
-}
-
-
-/**
- * 获取配置
- * @param context
- */
-// @ts-ignore
-exports.selectUiTitleAndType = async (context) => {
-    const app = new App(context, "selectUiTitleAndType");
-    return await app.run(async function () {
-        return getConfig();
-    });
-};
-
-
-/**
- * 用户昵称查询
- * @param context
- */
-// @ts-ignore
-exports.selectInfoByNick = async (context) => {
-    const app = new App(context, "selectInfoByNick");
-    return await app.run(async function () {
-        let baseDao = new BaseDao(context, this.tb);
-        let list = [];
-        let rs = {
-            "behaviorList": [
-                {
-                    "behaviorInformationArr": [],
-                    "title": this.type,
-                    "type": this.type
-                }
-            ]
-        }
-        let filter: any = {
-            activityId: this.activityId,
-            time: {
-                $gte: this.startTime,
-                $lte: this.endTime
-            },
-            type: this.type,
-        }
-        Utils.cleanObj(filter);
-        if (this.type === "assistAll") {
-            filter["data.inviter.nick"] = this.nick;
-            list = await baseDao.aggregate([
-                {
-                    $match: filter
-                },
-                {
-                    $sort: {
-                        time: -1
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        userNick: "$data.user.nick",
-                        inviterNick: "$data.inviter.nick",
-                        openId: "$data.user.openId",
-                        msg: "$data.message",
-                        time: 1
-                    }
-                }
-            ]);
-            list = list.map(v => {
-                return `【${v.inviterNick}】在【${v.time}】邀请【${v.userNick}-${v.openId}】,${v.msg || "邀请成功"}`;
-            });
-        }
-        rs.behaviorList[0].behaviorInformationArr = list;
-        return rs;
-    });
-}
-/**
- * 导出用户昵称
- * @param context
- */
-// @ts-ignore
-exports.exportUserNick = async (context) => {
-    const app = new App(context, "exportUserNick");
-    return await app.run(async function () {
-        let baseDao = new BaseDao(context, this.tb);
-        let url = "没有数据";
-        return {
-            outUrl: url
-        }
-    });
-}
-
-/**
- * 导出中奖数据
- * @param context
- */
-// @ts-ignore
-exports.exportWinnerData = async (context) => {
-    const app = new App(context, "exportWinnerData");
-    return await app.run(async function () {
-        let prizeService = new PrizeService(app);
-        return await prizeService.exportsWinnerData(getSelectWinnersConfig());
-    });
-}
-/**
- * 查询中奖数据
- * @param context
- */
-// @ts-ignore
-exports.selectWinnerData = async (context) => {
-    const app = new App(context, "selectWinnerData");
-    return await app.run(async function () {
-        let prizeService = new PrizeService(app);
-        return await prizeService.selectWinnerData(getSelectWinnersConfig());
-    });
-}
-/**
- * 导出统计数据
- * @param context
- */
-// @ts-ignore
-exports.exportStatistics = async (context) => {
-    const app = new App(context, "exportStatistics");
-    let need = ["activityId"]
-    return await app.run(async function () {
-        let spmService = new SpmService(app);
-        let url = await spmService.exportStatistics(getExportStatisticsConfig())
-        return {
-            outUrl: url
-        }
-    }, need);
-}
-
-// @ts-ignore
-exports.spm = async (context) => {
-    const app = new App(context, "spm");
-    return await app.run(async function () {
-        let spmService = new SpmService(app);
-        await spmService.addSpm(this.type);
-    }, ["type"]);
-}
-
-// @ts-ignore
-exports.spmCount = async (context) => {
-    const app = new App(context, "spmCount");
-    return await app.run(async function () {
-        let spmService = new SpmService(app);
-        let total = await spmService.spmCount();
-        return {total};
-    });
-};
-// @ts-ignore
-exports.disUser = async (context) => {
-    const app = new App(context, "disUser");
-    return await app.run(async function () {
-        let spmService = new SpmService(app);
-        let total = await spmService.disUser();
-        return {total};
-    });
-};
-
-// @ts-ignore
-exports.newUser = async (context) => {
-    const app = new App(context, "newUser");
-    return await app.run(async function () {
-        let spmService = new SpmService(app);
-        let total = await spmService.newUser();
-        return {total};
-    });
-};
-
-/**
- * 获取查询中奖信息配置
- */
-function getSelectWinnersConfig(config = getConfig().selectWinnerTitleAndTypeArr) {
-    let selConfig: any = {
-        config: {},
-        sort: config.sort
-    };
-    config.data.forEach(v => {
-        //输出字段设置
-        selConfig.config[v.type] = v.target;
-        selConfig.config[v.type].fileId = v.type;
-        selConfig.config[v.type].exportKey = v.title;
-    });
-    return selConfig;
-}
-
-
-/**
- * 获取到处统计数据配置
- */
-function getExportStatisticsConfig() {
-    let config: any = getConfig();
-    config = config.statisticsTitleAndTypeArr;
-    let exConfig = {
-        count: {},
-        noRepeat: {},
-        exportMapping: {}
-    };
-    config.forEach((v) => {
-        let type = v.parameter.type;
-        exConfig.exportMapping[v.type] = v.title;
-        let data = {
-            type,
-            exportKey: v.title,
-            repeat: true
-        }
-        if (v.fun === "spmCount") {
-            exConfig.count[v.type] = data
-        } else if (v.fun === "disUser") {
-            data.repeat = false;
-            exConfig.noRepeat[v.type] = data
-        }
-    });
-    return exConfig;
 }
 
 /**
@@ -282,14 +20,20 @@ function getConfig() {
             {
                 "title": "PV",
                 "type": "PV",
-                "parameter": {"type": "view"},
-                "fun": "spmCount"
+                "parameter": {"type": "PV"},
+                "fun": "selectSpm"
             },
             {
                 "title": "UV",
                 "type": "UV",
-                "parameter": {"type": "view"},
-                "fun": "disUser"
+                "parameter": {"type": "PV"},
+                "fun": "selectSpmDis"
+            },
+            {
+                "title": "newUV",
+                "type": "newUV",
+                "parameter": {"type": "PV"},
+                "fun": "selectSpmDisTotal"
             }
         ],
         //统计数据导出配置
@@ -443,3 +187,167 @@ function getConfig() {
         ]
     }
 }
+
+/**
+ * 后期检查数据
+ * @param context
+ */
+// @ts-ignore
+exports.aggregate = async (context) => {
+    const app = new App(context, "aggregate");
+    let need = ["tb", "pipe"];
+    return await app.run(async function () {
+        return await app.db(this.tb).aggregate(this.pipe);
+    }, need);
+}
+
+/**
+ * 后期修改数据
+ * @param context
+ */
+// @ts-ignore
+exports.update = async (context) => {
+    const app = new App(context, "update");
+    let need = ["tb", "filter", "options"];
+    return await app.run(async function () {
+        if (this.ok === true) {
+            return await app.db(this.tb).updateMany(this.filter, this.options);
+        }
+    }, need);
+}
+
+/**
+ * 后期修改数据
+ * @param context
+ */
+// @ts-ignore
+exports.clean = async (context) => {
+    const app = new App(context, "clean");
+    return await app.run(async function () {
+        if (this.ok === true) {
+            return await app.db(this.tb).deleteMany({
+                _id: {
+                    $ne: 0
+                }
+            });
+        }
+    }, ["tb"]);
+}
+
+//埋点
+// @ts-ignore
+exports.spm = async (context) => {
+    return await gmspm.spm.spm(context);
+}
+
+//查询次数统计
+// @ts-ignore
+exports.selectSpm = async (context) => {
+    return await gmspm.spm.selectSpm(context);
+}
+
+//查询人数统计
+// @ts-ignore
+exports.selectSpmDis = async (context) => {
+    return await gmspm.spm.selectSpmDis(context);
+}
+
+//查询新增人数统计
+// @ts-ignore
+exports.selectSpmDisTotal = async (context) => {
+    return await gmspm.spm.selectSpmDisTotal(context);
+}
+
+//查询字段总和统计
+// @ts-ignore
+exports.selectSpmSum = async (context) => {
+    return await gmspm.spm.selectSpmSum(context);
+}
+
+//导出统计数据
+// @ts-ignore
+exports.exportStatistics = async (context) => {
+    return await gmspm.spm.exportStatistics(context);
+}
+
+//查询奖品数据
+// @ts-ignore
+exports.selectPrize = async (context) => {
+    return await gmspm.spm.selectPrize(context);
+}
+
+//导出奖品
+// @ts-ignore
+exports.exportsPrize = async (context) => {
+    return await gmspm.spm.exportsPrize(context);
+}
+
+//ID导出
+// @ts-ignore
+exports.exportsNick = async (context) => {
+    return await gmspm.spm.exportsNick(context);
+}
+
+//行为数据查询
+// @ts-ignore
+exports.selectBehavior = async (context) => {
+    return await gmspm.spm.selectBehavior(context);
+}
+
+/**
+ * 后期检查数据
+ * @param context
+ */
+// @ts-ignore
+exports.aggregate = async (context) => {
+    const app = new App(context, "aggregate");
+    let need = ["tb", "pipe"];
+    return await app.run(async function () {
+        return await app.db(this.tb).aggregate(this.pipe);
+    }, need);
+}
+
+/**
+ * 后期修改数据
+ * @param context
+ */
+// @ts-ignore
+exports.update = async (context) => {
+    const app = new App(context, "update");
+    let need = ["tb", "filter", "options"];
+    return await app.run(async function () {
+        if (this.ok === true) {
+            return await app.db(this.tb).updateMany(this.filter, this.options);
+        }
+    }, need);
+}
+
+/**
+ * 后期清空表
+ * @param context
+ */
+// @ts-ignore
+exports.clean = async (context) => {
+    const app = new App(context, "clean");
+    return await app.run(async function () {
+        if (this.ok === true) {
+            return await app.db(this.tb).deleteMany({
+                _id: {
+                    $ne: 0
+                }
+            });
+        }
+    }, ["tb"]);
+}
+
+/**
+ * 获取配置
+ * @param context
+ */
+// @ts-ignore
+exports.selectUiTitleAndType = async (context) => {
+    const app = new App(context, "selectUiTitleAndType");
+    return await app.run(async function () {
+        return getConfig();
+    });
+};

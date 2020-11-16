@@ -50,6 +50,7 @@ function getConfig() {
             "fixParameter": {
                 sort: {
                     //排序
+                    time: -1
                 },
                 filter: {
                     //额外查询
@@ -102,6 +103,7 @@ function getConfig() {
                     "fixParameter": {
                         sort: {
                             //排序
+                            time: -1
                         },
                         filter: {
                             //额外查询

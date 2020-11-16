@@ -69,25 +69,25 @@ function getConfig() {
             },
             "data": [  //奖品展示标题
                 {
-                    title: "ID", type: "nick"
+                    title: "ID", type: "nick", targetField: "nick"
                 },
                 {
-                    title: "姓名", type: "name"
+                    title: "姓名", type: "name", targetField: "ext.name"
                 },
                 {
-                    title: "电话", type: "tel"
+                    title: "电话", type: "tel", targetField: "ext.tel"
                 },
                 {
-                    title: "省", type: "province"
+                    title: "省", type: "province", targetField: "ext.province"
                 },
                 {
-                    title: "市", type: "city"
+                    title: "市", type: "city", targetField: "ext.city"
                 },
                 {
-                    title: "区", type: "district"
+                    title: "区", type: "district", targetField: "ext.district"
                 },
                 {
-                    title: "详细地址", type: "desc"
+                    title: "详细地址", type: "desc", targetField: "ext.desc"
                 }
             ]
         },

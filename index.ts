@@ -199,7 +199,7 @@ exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");
     let need = ["tb", "pipe"];
     return await app.run(async function () {
-        return await app.db(this.tb).aggregate(this.pipe);
+        app.response.data = await app.db(this.tb).aggregate(this.pipe);
     }, need);
 }
 
@@ -213,7 +213,7 @@ exports.update = async (context) => {
     let need = ["tb", "filter", "options"];
     return await app.run(async function () {
         if (this.ok === true) {
-            return await app.db(this.tb).updateMany(this.filter, this.options);
+            app.response.data = await app.db(this.tb).updateMany(this.filter, this.options);
         }
     }, need);
 }
@@ -227,7 +227,7 @@ exports.clean = async (context) => {
     const app = new App(context, "clean");
     return await app.run(async function () {
         if (this.ok === true) {
-            return await app.db(this.tb).deleteMany({
+            app.response.data = await app.db(this.tb).deleteMany({
                 _id: {
                     $ne: 0
                 }
@@ -305,7 +305,7 @@ exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");
     let need = ["tb", "pipe"];
     return await app.run(async function () {
-        return await app.db(this.tb).aggregate(this.pipe);
+        app.response.data = await app.db(this.tb).aggregate(this.pipe);
     }, need);
 }
 
@@ -319,7 +319,7 @@ exports.update = async (context) => {
     let need = ["tb", "filter", "options"];
     return await app.run(async function () {
         if (this.ok === true) {
-            return await app.db(this.tb).updateMany(this.filter, this.options);
+            app.response.data = await app.db(this.tb).updateMany(this.filter, this.options);
         }
     }, need);
 }
@@ -333,7 +333,7 @@ exports.clean = async (context) => {
     const app = new App(context, "clean");
     return await app.run(async function () {
         if (this.ok === true) {
-            return await app.db(this.tb).deleteMany({
+            app.response.data = await app.db(this.tb).deleteMany({
                 _id: {
                     $ne: 0
                 }
@@ -350,6 +350,6 @@ exports.clean = async (context) => {
 exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");
     return await app.run(async function () {
-        return getConfig();
+        app.response.data = getConfig();
     });
 };

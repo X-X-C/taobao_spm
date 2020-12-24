@@ -48,13 +48,8 @@ function getConfig() {
             "showTime": true,//是否需要时间查询
             "fun": "selectPrize",//云函数方法名，自定义
             "fixParameter": {
-                sort: {
-                    //排序
-                    time: -1
-                },
-                filter: {
-                    //额外查询
-                },
+                sort: {},
+                filter: {},
                 winnerTitleAndTypeArr: prizeConfig()
             },//固定参数，查询接口时候会默认带上内部所有参数
             "parameter": {  //动态参数，比如 type:'type值1'
@@ -62,10 +57,7 @@ function getConfig() {
                     "type": "radio", //单选框
                     "title": "类型标题",
                     "options": [
-                        {
-                            "title": "所有类型",
-                            "value": "lottery"
-                        },
+                        ...prizeOptions()
                     ]
                 }
             },
@@ -94,14 +86,7 @@ function getConfig() {
                             "type": "radio", //单选框
                             "title": "类型标题",
                             "options": [
-                                {
-                                    "title": "抽奖",
-                                    "value": "lottery"
-                                },
-                                {
-                                    "title": "排行榜",
-                                    "value": "rank"
-                                },
+                                ...prizeOptions()
                             ]
                         }
                     }
@@ -126,10 +111,7 @@ function getConfig() {
                             "type": "radio", //单选框
                             "title": "类型标题",
                             "options": [
-                                {
-                                    "title": "助力",
-                                    "value": "assist"
-                                },
+                                ...allTypeNickExportConfig()
                             ]
                         }
                     }
@@ -163,10 +145,29 @@ function getConfig() {
     }
 }
 
+function prizeOptions() {
+    return [
+        {
+            "title": "抽奖",
+            "value": "lottery"
+        },
+        {
+            "title": "排行榜",
+            "value": "rank"
+        }
+    ];
+}
+
 function prizeConfig() {
     return [  //奖品展示标题
         {
             title: "ID", type: "nick", targetField: "nick"
+        },
+        {
+            title: "奖品名", type: "prizeName", targetField: "prizeName"
+        },
+        {
+            title: "获得时间", type: "time", targetField: "time"
         },
         {
             title: "姓名", type: "name", targetField: "ext.name"
@@ -187,7 +188,15 @@ function prizeConfig() {
             title: "详细地址", type: "desc", targetField: "ext.desc"
         }
     ]
+}
 
+function allTypeNickExportConfig() {
+    return getConfig().statisticsTitleAndTypeArr.map(v => {
+        return {
+            "title": v.title,
+            "value": v.parameter.type
+        }
+    });
 }
 
 /**

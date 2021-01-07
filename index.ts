@@ -1,6 +1,7 @@
 import App from "./base/App";
 // @ts-ignore
 import * as gmspm from "gm-spm";
+import ActivityService from "./base/service/ActivityService";
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");
@@ -13,7 +14,7 @@ exports.main = async (context) => {
  * 获取配置
  * @doc https://www.yuque.com/ggikb6/towlr0/qpy01t
  */
-function getConfig() {
+async function getConfig() {
     return {
         //统计数据配置
         "statisticsTitleAndTypeArr": [
@@ -34,7 +35,8 @@ function getConfig() {
                 "type": "newUV",
                 "parameter": {"type": "PV"},
                 "fun": "selectSpmDisTotal"
-            }
+            },
+            ...await activityStatistics.call(this)
         ],
         //统计数据导出配置
         "exportStatistics": {
@@ -143,6 +145,18 @@ function getConfig() {
             }
         ]
     }
+}
+
+
+async function activityStatistics() {
+    let app: App = this;
+    let activityService = app.getService(ActivityService);
+    let activity = (await activityService.getActivity(activityService.pureFiled)).data;
+    //获取到活动
+    if (activity) {
+
+    }
+    return [];
 }
 
 function prizeOptions() {
@@ -357,8 +371,8 @@ exports.clean = async (context) => {
  */
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
-    const app = new App(context, "selectUiTitleAndType");
+    const app: App = new App(context, "selectUiTitleAndType");
     return await app.run(async function () {
-        app.response.data = getConfig();
+        app.response.data = await getConfig.call(app);
     });
 };

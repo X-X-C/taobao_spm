@@ -119,7 +119,7 @@ exports.selectBehavior = async (context) => {
  */
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
-    const app: App = new App(context, "selectUiTitleAndType");
+    const app = new App(context, "selectUiTitleAndType");
     return await app.run(async function () {
         /**
          * PrizeConfig

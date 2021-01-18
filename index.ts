@@ -120,6 +120,7 @@ exports.selectBehavior = async (context) => {
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");
+    app.config.globalActivity = false;
     return await app.run(async function () {
         /**
          * PrizeConfig

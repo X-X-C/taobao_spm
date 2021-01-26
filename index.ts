@@ -113,6 +113,46 @@ exports.exportsNick = async (context) => {
 exports.selectBehavior = async (context) => {
     return await gmspm.spm.selectBehavior(context);
 }
+
+const spmFun = {
+    A: "selectSpm",
+    B: "selectSpmDis",
+    C: "selectSpmDisTotal"
+}
+
+function generateSpm(config: any[]) {
+
+    function baseSpm(title, type, funName) {
+        return {
+            title: title,
+            type: (() => {
+                if (funName === spmFun.B) {
+                    return type + "Count";
+                } else if (funName === spmFun.C) {
+                    return type + "NewCount";
+                } else {
+                    return type;
+                }
+            })(),
+            parameter: {"type": type},
+            fun: funName
+        }
+    }
+
+    let finalData = [];
+
+    for (let c of config) {
+        if (c.A === true) {
+            finalData.push(baseSpm(c.title, c.type, spmFun.A));
+        } else if (c.B === true) {
+            finalData.push(baseSpm(c.title, c.type, spmFun.B));
+        } else if (c.C === true) {
+            finalData.push(baseSpm(c.title, c.type, spmFun.C));
+        }
+    }
+    return finalData;
+}
+
 /**
  * 获取配置
  * @param context
@@ -178,21 +218,24 @@ exports.selectUiTitleAndType = async (context) => {
                 {
                     "title": "PV",
                     "type": "PV",
-                    "parameter": {"type": "PV"},
+                    "parameter": {"type": "view"},
                     "fun": "selectSpm"
                 },
                 {
                     "title": "UV",
                     "type": "UV",
-                    "parameter": {"type": "PV"},
+                    "parameter": {"type": "view"},
                     "fun": "selectSpmDis"
                 },
                 {
                     "title": "newUV",
                     "type": "newUV",
-                    "parameter": {"type": "PV"},
+                    "parameter": {"type": "view"},
                     "fun": "selectSpmDisTotal"
                 },
+                ...generateSpm([
+                    {title: "", type: "", A: false, B: false, C: false},
+                ]),
             ],
             //统计数据导出配置
             "exportStatistics": {

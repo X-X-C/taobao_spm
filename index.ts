@@ -249,8 +249,8 @@ exports.selectUiTitleAndType = async (context) => {
                 "showTime": true,//是否需要时间查询
                 "fun": "selectPrize",//云函数方法名，自定义
                 "fixParameter": {
-                    sort: {},
-                    filter: {},
+                    // sort: {},
+                    // filter: {},
                     winnerTitleAndTypeArr: prizeConfig
                 },//固定参数，查询接口时候会默认带上内部所有参数
                 "parameter": {  //动态参数，比如 type:'type值1'
@@ -277,9 +277,9 @@ exports.selectUiTitleAndType = async (context) => {
                                 //排序
                                 time: -1
                             },
-                            filter: {
-                                //额外查询
-                            },
+                            // filter: {
+                            //     //额外查询
+                            // },
                             winnerTitleAndTypeArr: prizeConfig
                         },//固定参数，查询接口时候会默认带上内部所有参数
                         "parameter": {  //动态参数，比如 type:'type值1'
@@ -303,9 +303,9 @@ exports.selectUiTitleAndType = async (context) => {
                         "showTime": true,//是否需要时间查询
                         "fun": "exportsNick",//云函数方法名，自定义
                         "fixParameter": {
-                            filter: {
-                                //额外查询
-                            }
+                            // filter: {
+                            //     //额外查询
+                            // }
                         },//固定参数，查询接口时候会默认带上内部所有参数
                         "parameter": {  //动态参数，比如 type:'type值1'
                             "type": {

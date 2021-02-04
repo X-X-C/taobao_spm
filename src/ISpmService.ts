@@ -11,8 +11,9 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
     }
 
     get baseData() {
+        let {spmFun} = this;
         this.spmConfig = [
-            {title: "", type: "", A: false, B: true, C: false}
+            {title: "", type: "", fun: spmFun.A}
         ]
         this.prizeConfig = [
             {title: "ID", type: "nick", targetField: "nick"},
@@ -191,13 +192,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
 
         let finalData = [];
         for (let c of config) {
-            if (c.A === true) {
-                finalData.push(baseSpm(c.title, c.type, spmFun.A));
-            } else if (c.B === true) {
-                finalData.push(baseSpm(c.title, c.type, spmFun.B));
-            } else if (c.C === true) {
-                finalData.push(baseSpm(c.title, c.type, spmFun.C));
-            }
+            finalData.push(baseSpm(c.title, c.type, c.fun));
         }
         return finalData;
     }

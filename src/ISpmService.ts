@@ -18,12 +18,12 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
             {title: "ID", type: "nick", targetField: "nick"},
             {title: "奖品名", type: "prizeName", targetField: "prizeName"},
             {title: "获得时间", type: "time", targetField: "time"},
-            {title: "姓名", type: "name", targetField: "ext.name"},
-            {title: "电话", type: "tel", targetField: "ext.tel"},
-            {title: "省", type: "province", targetField: "ext.province"},
-            {title: "市", type: "city", targetField: "ext.city"},
-            {title: "区", type: "district", targetField: "ext.district"},
-            {title: "详细地址", type: "desc", targetField: "ext.desc"}
+            {title: "姓名", type: "name", targetField: "info.name"},
+            {title: "电话", type: "tel", targetField: "info.tel"},
+            {title: "省", type: "province", targetField: "info.province"},
+            {title: "市", type: "city", targetField: "info.city"},
+            {title: "区", type: "district", targetField: "info.district"},
+            {title: "详细地址", type: "desc", targetField: "info.desc"}
         ]
         this.prizeOptions = [
             this.generateOptions("排行榜", "rank"),
@@ -32,8 +32,8 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         // this.prizeExtFilter = {};
         // this.prizeSort = {};
         this.addWinnerExport("中奖数据", {});
-        this.addDefaultUserNickSelect();
-        this.addDefaultUserNickExport()
+        this.addAllSpmUserNickExport();
+        this.addAllSpmUserNickSelect()
 
         return {
             statisticsTitleAndTypeArr: this.spmConfig,
@@ -274,7 +274,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
     addUserNickSelect(title, {
         parameter = {},
         options = [],
-        fun = ""
+        fun = <"defaultNickSelect">""
     }) {
         let u = {
             "title": title,
@@ -299,7 +299,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         return u;
     }
 
-    addDefaultUserNickSelect() {
+    addAllSpmUserNickSelect() {
         let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
         return this.addUserNickSelect("行为数据", {
             options,
@@ -307,7 +307,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         });
     }
 
-    addDefaultUserNickExport() {
+    addAllSpmUserNickExport() {
         let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
         return this.addUserNickExport("行为数据", {
             options
@@ -315,7 +315,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
     }
 
     async defaultNickSelect() {
-        let {activityId, type, nick, startTime, endTime, page, size} = this.data;
+        let {activityId, type, nick, startTime, endTime, page, size, extMatch} = this.data;
         let title: string = this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
         let filter = {
             activityId,
@@ -324,24 +324,24 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
             time: {
                 $gte: startTime,
                 $lte: endTime
-            }
+            },
+            ...extMatch
         }
         Utils.cleanObj(filter);
-        page = page || 1;
-        size = size || 30;
-        let rs = await this.pageList(filter, {
+        let rs: any = await this.pageList(filter, {
             page,
             size,
             project: {
                 _id: 0,
                 nick: 1,
-                time: 1
+                time: 1,
+                desc: "$data.desc"
             }
         })
         this.response.data.behaviorList = [
             {
                 "behaviorInformationArr": [
-                    ...rs.data.map(v => `【${v.nick || "未授权用户"}】在【${v.time}】触发【${title}】`)
+                    ...rs.data.map(v => v.desc ? v.desc : `【${v.nick || "未授权用户"}】在【${v.time}】触发【${title}】`)
                 ],
                 "title": `【${title}】共${rs.total}条`,
                 "type": type

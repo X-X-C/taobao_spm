@@ -34,6 +34,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         this.addWinnerExport("中奖数据", {});
         this.addAllSpmUserNickExport();
         this.addAllSpmUserNickSelect()
+        this.addAssistUserNickSelect();
 
         return {
             statisticsTitleAndTypeArr: this.spmConfig,
@@ -274,7 +275,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
     addUserNickSelect(title, {
         parameter = {},
         options = [],
-        fun = <"defaultNickSelect">""
+        fun = <"defaultNickSelect" | "assistNickSelect">""
     }) {
         let u = {
             "title": title,
@@ -294,7 +295,6 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
                 }
             }
         }
-
         this.userNickSelectConfig = u;
         return u;
     }
@@ -307,6 +307,22 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         });
     }
 
+    addAssistUserNickSelect() {
+        let options = [
+            this.generateOptions("邀请明细", "all"),
+            this.generateOptions("邀请成功", "success"),
+            this.generateOptions("邀请失败", "fail"),
+            this.generateOptions("被邀请信息", "allInvite"),
+            this.generateOptions("被邀请成功", "successInvite"),
+            this.generateOptions("被邀请失败", "failInvite"),
+        ]
+        this.addUserNickSelect("邀请明细", {
+            options,
+            fun: "assistNickSelect"
+        });
+        return options;
+    }
+
     addAllSpmUserNickExport() {
         let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
         return this.addUserNickExport("行为数据", {
@@ -314,9 +330,9 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         });
     }
 
-    async defaultNickSelect() {
+    async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""}) {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch} = this.data;
-        let title: string = this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
+        let title: string = customTitle || this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
         let filter = {
             activityId,
             type,
@@ -325,7 +341,8 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
                 $gte: startTime,
                 $lte: endTime
             },
-            ...extMatch
+            ...extMatch,
+            ...customExtMatch
         }
         Utils.cleanObj(filter);
         let rs: any = await this.pageList(filter, {
@@ -349,4 +366,74 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         ]
     }
 
+    async assistNickSelect() {
+        let {type, nick} = this.data, trulyType = "assistAll";
+        let title = this.addAssistUserNickSelect().find(v => v.value === type)?.title;
+        switch (type) {
+            case "all":
+                await this.defaultNickSelect({
+                    customExtMatch: {
+                        nick: "",
+                        "data.inviter.nick": nick,
+                        type: trulyType
+                    },
+                    customTitle: title
+                })
+                break;
+            case "success":
+                await this.defaultNickSelect({
+                    customExtMatch: {
+                        nick: "",
+                        "data.inviter.nick": nick,
+                        "data.code": 200,
+                        type: trulyType
+                    },
+                    customTitle: title
+                })
+                break;
+            case "fail":
+                await this.defaultNickSelect({
+                    customExtMatch: {
+                        nick: "",
+                        "data.inviter.nick": nick,
+                        type: trulyType,
+                        "data.code": {
+                            $ne: 200
+                        }
+                    },
+                    customTitle: title
+                })
+                break;
+            case "allInvite":
+                await this.defaultNickSelect({
+                    customExtMatch: {
+                        type: trulyType
+                    },
+                    customTitle: title
+                })
+                break;
+            case "successInvite":
+                await this.defaultNickSelect({
+                    customExtMatch: {
+                        type: trulyType,
+                        "data.code": 200,
+                    },
+                    customTitle: title
+                })
+                break;
+            case "failInvite":
+                await this.defaultNickSelect({
+                    customExtMatch: {
+                        type: trulyType,
+                        "data.code": {
+                            $ne: 200
+                        }
+                    },
+                    customTitle: title
+                })
+                break;
+            default:
+                await this.defaultNickSelect({})
+        }
+    }
 }

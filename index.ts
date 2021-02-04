@@ -96,11 +96,18 @@ exports.selectBehavior = async (context) => {
 // @ts-ignore
 exports.defaultNickSelect = async (context) => {
     const app = new App(context, "defaultNickSelect");
-    app.config.globalActivity = false;
     return await app.run(async function () {
-        await app.getService(ISpmService).defaultNickSelect();
+        await app.getService(ISpmService).defaultNickSelect({});
     });
 }
+
+// @ts-ignore
+exports.assistNickSelect = async (context) => {
+    const app = new App(context, "assistNickSelect");
+    return await app.run(async function () {
+        await app.getService(ISpmService).assistNickSelect();
+    });
+};
 
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
@@ -109,4 +116,6 @@ exports.selectUiTitleAndType = async (context) => {
     return await app.run(async function () {
         app.response.data = app.getService(ISpmService).baseData;
     });
-};
+}
+
+

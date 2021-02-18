@@ -355,7 +355,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
                 "behaviorInformationArr": [
                     ...rs.data.map(v => v.desc ? v.desc : `【${v.nick || "未授权用户"}】在【${v.time}】触发【${title}】`)
                 ],
-                "title": `【${title}】共${rs.total}条`,
+                "title": `${title ? `【${title}】` : ""}共${rs.total}条`,
                 "type": type
             }
         ]

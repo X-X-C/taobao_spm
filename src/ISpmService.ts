@@ -32,7 +32,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         ]
         // this.prizeExtFilter = {};
         // this.prizeSort = {};
-        this.addWinnerExport("中奖数据", {});
+        this.addWinnerExport("中奖数据");
         this.addAllSpmUserNickExport();
         this.addAllSpmUserNickSelect()
         this.addAssistUserNickSelect();
@@ -209,7 +209,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         prizeOptions = this.prizeOptions,
         parameter = this.prizeParameter,
         fun = ""
-    }) {
+    } = {}) {
         let p = {
             "title": title,
             "export": {
@@ -239,7 +239,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         parameter = {},
         options = [],
         fun = ""
-    }) {
+    } = {}) {
         let e = {
             "title": title,
             "export": {
@@ -271,7 +271,7 @@ export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
         parameter = {},
         options = [],
         fun = <"defaultNickSelect" | "assistNickSelect">""
-    }) {
+    } = {}) {
         let u = {
             "title": title,
             "export": {

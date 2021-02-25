@@ -5,7 +5,7 @@ import App from "../base/App";
 import Utils from "../base/utils/Utils";
 
 
-export default class ISpmService extends BaseService<SpmDao<Spm>, Spm> {
+export default class ISpmService extends BaseService<Spm> {
     constructor(app: App) {
         super(SpmDao, app);
     }

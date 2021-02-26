@@ -12,26 +12,36 @@ exports.main = async (context) => {
 // @ts-ignore
 exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");
-    let need = ["tb", "pipe"];
+    app.runNeedParams = {
+        tb: "string",
+        pipe: "array"
+    }
     return await app.run(async function () {
         app.response.data = await app.db(this.tb).aggregate(this.pipe);
-    }, need);
+    });
 }
 
 // @ts-ignore
 exports.update = async (context) => {
     const app = new App(context, "update");
-    let need = ["tb", "filter", "options"];
+    app.runNeedParams = {
+        tb: "string",
+        filter: "object",
+        options: "object"
+    }
     return await app.run(async function () {
         if (this.ok === true) {
             app.response.data = await app.db(this.tb).updateMany(this.filter, this.options);
         }
-    }, need);
+    });
 }
 
 // @ts-ignore
 exports.clean = async (context) => {
     const app = new App(context, "clean");
+    app.runNeedParams = {
+        tb: "string"
+    }
     return await app.run(async function () {
         if (this.ok === true) {
             app.response.data = await app.db(this.tb).deleteMany({
@@ -40,8 +50,25 @@ exports.clean = async (context) => {
                 }
             });
         }
-    }, ["tb"]);
+    });
 }
+
+
+// @ts-ignore
+exports.insert = async (context) => {
+    const app = new App(context, "clean");
+    app.runNeedParams = {
+        tb: "string",
+        data: "array"
+    }
+    return await app.run(async function () {
+        if (this.ok === true) {
+            app.response.data = await app.db(this.tb).insertMany(this.data);
+        }
+    });
+}
+
+
 // @ts-ignore
 exports.spm = async (context) => {
     return await gmspm.spm.spm(context);

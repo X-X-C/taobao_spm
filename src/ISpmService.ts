@@ -38,33 +38,9 @@ export default class ISpmService extends BaseService<Spm> {
         this.addAssistUserNickSelect();
 
         return {
-            statisticsTitleAndTypeArr: this.spmConfig,
-            "exportStatistics": {
-                "fixParameter": {},//固定参数，调用接口会默认传入内部所有参数
-                "fun": "exportStatistics",//接口名称
-                "title": "导出"
-            },
-            "selectWinnerTitleAndTypeArr": {
-                "title": "中奖数据查询", //标题
-                "showTime": true,//是否需要时间查询
-                "fun": "selectPrize",//云函数方法名，自定义
-                "fixParameter": {
-                    // sort: {},
-                    // filter: {},
-                    winnerTitleAndTypeArr: this.prizeConfig,
-                    ...this.prizeParameter
-                },//固定参数，查询接口时候会默认带上内部所有参数
-                "parameter": {  //动态参数，比如 type:'type值1'
-                    "type": {
-                        "type": "radio", //单选框
-                        "title": "类型标题",
-                        "options": [
-                            ...this.prizeOptions
-                        ]
-                    }
-                },
-                "data": this.prizeConfig
-            },
+            "statisticsTitleAndTypeArr": this.spmConfig,
+            "exportStatistics": this.spmExportConfig,
+            "selectWinnerTitleAndTypeArr": this.winnerSelectConfig,
             "winnerTitleAndTypeArr": this.exportWinnerConfig,
             "userNicksExportsArr": this.userNickExportConfig,
             "behaviorTitleAndTypeArr": this.userNickSelectConfig
@@ -77,7 +53,7 @@ export default class ISpmService extends BaseService<Spm> {
         C: "selectSpmDisTotal"
     };
 
-    _: other = {
+    _: any = {
         prizeOptions: [],
         prizeConfig: [],
         spmConfig: [
@@ -168,6 +144,38 @@ export default class ISpmService extends BaseService<Spm> {
 
     set userNickSelectConfig(v) {
         this._.userNickSelectConfig.push(v);
+    }
+
+    get spmExportConfig() {
+        return {
+            "fixParameter": {},//固定参数，调用接口会默认传入内部所有参数
+            "fun": "exportStatistics",//接口名称
+            "title": "导出"
+        }
+    }
+
+    get winnerSelectConfig() {
+        return {
+            "title": "中奖数据查询", //标题
+            "showTime": true,//是否需要时间查询
+            "fun": "selectPrize",//云函数方法名，自定义
+            "fixParameter": {
+                // sort: {},
+                // filter: {},
+                winnerTitleAndTypeArr: this.prizeConfig,
+                ...this.prizeParameter
+            },//固定参数，查询接口时候会默认带上内部所有参数
+            "parameter": {  //动态参数，比如 type:'type值1'
+                "type": {
+                    "type": "radio", //单选框
+                    "title": "类型标题",
+                    "options": [
+                        ...this.prizeOptions
+                    ]
+                }
+            },
+            "data": this.prizeConfig
+        }
     }
 
     generateSpm(config: any[]) {

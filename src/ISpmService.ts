@@ -1,5 +1,4 @@
 import BaseService from "../base/service/abstract/BaseService";
-import SpmDao from "../base/dao/SpmDao";
 import Spm from "../base/entity/Spm";
 import App from "../base/App";
 import Utils from "../base/utils/Utils";
@@ -7,7 +6,7 @@ import Utils from "../base/utils/Utils";
 
 export default class ISpmService extends BaseService<Spm> {
     constructor(app: App) {
-        super(SpmDao, app);
+        super("spm", app);
     }
 
     get baseData() {

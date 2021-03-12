@@ -138,6 +138,14 @@ exports.assistNickSelect = async (context) => {
 };
 
 // @ts-ignore
+exports.commonReissue = async (context) => {
+    const app = new App(context, "commonReissue");
+    return await app.run(async function () {
+        await app.getService(ISpmService).commonReissue();
+    });
+};
+
+// @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");
     app.config.globalActivity = false;

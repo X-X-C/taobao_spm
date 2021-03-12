@@ -2,7 +2,11 @@ import BaseService from "../base/service/abstract/BaseService";
 import Spm from "../base/entity/Spm";
 import App from "../base/App";
 import Utils from "../base/utils/Utils";
+import TopService from "../base/service/TopService";
+import BaseDao from "../base/dao/BaseDao";
 
+
+type generateParameterType = { key: string, type?: string, title: string }
 
 export default class ISpmService extends BaseService<Spm> {
     constructor(app: App) {
@@ -42,7 +46,8 @@ export default class ISpmService extends BaseService<Spm> {
             "selectWinnerTitleAndTypeArr": this.winnerSelectConfig,
             "winnerTitleAndTypeArr": this.exportWinnerConfig,
             "userNicksExportsArr": this.userNickExportConfig,
-            "behaviorTitleAndTypeArr": this.userNickSelectConfig
+            "behaviorTitleAndTypeArr": this.userNickSelectConfig,
+            "reissueArr": this.reissueConfig
         }
     }
 
@@ -78,7 +83,8 @@ export default class ISpmService extends BaseService<Spm> {
         prizeFixParameter: {},
         exportWinnerConfig: [],
         userNicksExportConfig: [],
-        userNickSelectConfig: []
+        userNickSelectConfig: [],
+        reissueConfig: []
     }
 
     get spmConfig() {
@@ -107,6 +113,10 @@ export default class ISpmService extends BaseService<Spm> {
 
     get userNickExportConfig() {
         return this._.userNicksExportConfig;
+    }
+
+    get reissueConfig() {
+        return this._.reissueConfig;
     }
 
     set prizeParameter(v) {
@@ -143,6 +153,10 @@ export default class ISpmService extends BaseService<Spm> {
 
     set userNickSelectConfig(v) {
         this._.userNickSelectConfig.push(v);
+    }
+
+    set reissueConfig(v) {
+        this._.reissueConfig.push(v);
     }
 
     get spmExportConfig() {
@@ -209,6 +223,17 @@ export default class ISpmService extends BaseService<Spm> {
             title,
             value
         }
+    }
+
+    generateParameter(parameterArr: generateParameterType[]) {
+        let o = {};
+        for (const p of parameterArr) {
+            o[p.key] = {
+                type: p.type || "input",
+                title: p.title
+            }
+        }
+        return o;
     }
 
     addWinnerExport(title, {
@@ -301,6 +326,25 @@ export default class ISpmService extends BaseService<Spm> {
         return u;
     }
 
+    addReissueConfig(title, {
+        fixParameter = {},
+        parameter = <generateParameterType[]>[],
+        fun
+    }) {
+        let r = {
+            "title": title,
+            "export": {
+                "showTime": true,
+                "fixParameter": fixParameter,
+                "parameter": this.generateParameter(parameter),
+                "title": "补发类型",
+                "fun": fun
+            }
+        }
+        this.reissueConfig = r;
+        return r;
+    }
+
     addAllSpmUserNickSelect() {
         let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
         return this.addUserNickSelect("行为数据", {
@@ -329,6 +373,46 @@ export default class ISpmService extends BaseService<Spm> {
         let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
         return this.addUserNickExport("行为数据", {
             options
+        });
+    }
+
+    addPointReissue() {
+        this.addReissueConfig("积分补发", {
+            fun: "commonReissue",
+            fixParameter: {
+                reissueType: "point"
+            },
+            parameter: [
+                {key: "nick", title: "用户昵称"},
+                {key: "point", title: "补发积分数量"},
+            ]
+        });
+    }
+
+    addBenefitReissue() {
+        this.addReissueConfig("权益补发", {
+            fun: "commonReissue",
+            fixParameter: {
+                reissueType: "benefit"
+            },
+            parameter: [
+                {key: "nick", title: "用户昵称"},
+                {key: "ename", title: "权益ename"},
+            ]
+        });
+    }
+
+    addMarkReissue() {
+        this.addReissueConfig("打标补发", {
+            fun: "commonReissue",
+            fixParameter: {
+                reissueType: "mark"
+            },
+            parameter: [
+                {key: "nick", title: "用户昵称"},
+                {key: "itemId", title: "商品ID"},
+                {key: "skuId", title: "商品SKU"},
+            ]
         });
     }
 
@@ -436,6 +520,45 @@ export default class ISpmService extends BaseService<Spm> {
                 break;
             default:
                 await this.defaultNickSelect({})
+        }
+    }
+
+    async commonReissue() {
+        let {type, nick} = this.data;
+        let dao = new BaseDao<any>(this.context);
+        dao.initTb("users");
+        let user = await dao.get({
+            activityId: this.activityId,
+            nick,
+            //已授权用户
+            avatar: {
+                $ne: false
+            }
+        });
+        if (!user) {
+            this.response.set222("查无此人");
+            return;
+        }
+        let topService = this.getService(TopService);
+        let r;
+        switch (type) {
+            case "mark":
+                let {itemId, skuId} = this.data;
+                r = await topService.opentradeSpecialUsersMark(skuId, itemId, {
+                    open_user_ids: user.openId
+                })
+                break;
+            case "benefit":
+                let {ename} = this.data;
+                r = await topService.sendBenefit(ename, user.openId);
+                break;
+            case "point":
+                let {point} = this.data;
+                r = await topService.taobaoCrmPointChange(Number(point), user.openId);
+                break
+        }
+        if (r.code !== 1) {
+            this.response.message = Utils.toJson(r.data);
         }
     }
 }

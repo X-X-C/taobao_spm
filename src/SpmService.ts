@@ -1,16 +1,14 @@
-import BaseService from "../base/service/abstract/BaseService";
-import Spm from "../base/entity/Spm";
 import App from "../base/App";
 import Utils from "../base/utils/Utils";
 import TopService from "../base/service/TopService";
 import BaseDao from "../base/dao/BaseDao";
-
+import XSpmService from "../base/service/XSpmService";
 
 type generateParameterType = { key: string, type?: string, title: string }
 
-export default class ISpmService extends BaseService<Spm> {
+export default class SpmService extends XSpmService {
     constructor(app: App) {
-        super(app, "spm");
+        super(app)
     }
 
     get baseData() {

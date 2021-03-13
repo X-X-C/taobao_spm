@@ -1,7 +1,7 @@
 import App from "./base/App";
 // @ts-ignore
 import * as gmspm from "gm-spm";
-import ISpmService from "./src/ISpmService";
+import SpmService from "./src/SpmService";
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");
@@ -125,7 +125,7 @@ exports.selectBehavior = async (context) => {
 exports.defaultNickSelect = async (context) => {
     const app = new App(context, "defaultNickSelect");
     return await app.run(async function () {
-        await app.getService(ISpmService).defaultNickSelect({});
+        await app.getService(SpmService).defaultNickSelect({});
     });
 }
 
@@ -133,7 +133,7 @@ exports.defaultNickSelect = async (context) => {
 exports.assistNickSelect = async (context) => {
     const app = new App(context, "assistNickSelect");
     return await app.run(async function () {
-        await app.getService(ISpmService).assistNickSelect();
+        await app.getService(SpmService).assistNickSelect();
     });
 };
 
@@ -141,7 +141,7 @@ exports.assistNickSelect = async (context) => {
 exports.commonReissue = async (context) => {
     const app = new App(context, "commonReissue");
     return await app.run(async function () {
-        await app.getService(ISpmService).commonReissue();
+        await app.getService(SpmService).commonReissue();
     });
 };
 
@@ -150,7 +150,7 @@ exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");
     app.config.globalActivity = false;
     return await app.run(async function () {
-        app.response.data = app.getService(ISpmService).baseData;
+        app.response.data = app.getService(SpmService).baseData;
     });
 }
 

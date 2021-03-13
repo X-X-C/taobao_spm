@@ -10,7 +10,7 @@ type generateParameterType = { key: string, type?: string, title: string }
 
 export default class ISpmService extends BaseService<Spm> {
     constructor(app: App) {
-        super("spm", app);
+        super(app, "spm");
     }
 
     get baseData() {
@@ -544,17 +544,24 @@ export default class ISpmService extends BaseService<Spm> {
         switch (type) {
             case "mark":
                 let {itemId, skuId} = this.data;
-                r = await topService.opentradeSpecialUsersMark(skuId, itemId, {
-                    open_user_ids: user.openId
+                r = await topService.opentradeSpecialUsersMark({
+                    skuId,
+                    itemId
                 })
                 break;
             case "benefit":
                 let {ename} = this.data;
-                r = await topService.sendBenefit(ename, user.openId);
+                r = await topService.sendBenefit({
+                    ename,
+                    receiverOpenId: user.openId
+                });
                 break;
             case "point":
                 let {point} = this.data;
-                r = await topService.taobaoCrmPointChange(Number(point), user.openId);
+                r = await topService.taobaoCrmPointChange({
+                    num: Number(point),
+                    openId: user.openId
+                });
                 break
         }
         if (r.code !== 1) {

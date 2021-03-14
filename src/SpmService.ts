@@ -37,6 +37,14 @@ export default class SpmService extends XSpmService {
         this.addAllSpmUserNickExport();
         this.addAllSpmUserNickSelect()
         this.addAssistUserNickSelect();
+        this.addUserNickSelect("通用查询", {
+            options: [
+                // this.generateOptions("游戏次数变更", "_gameNum"),
+                // this.generateOptions("分数变更", "_score"),
+                // this.generateOptions("抽奖次数变更", "_lotteryCount"),
+                // this.generateOptions("抽奖信息", "_lotteryResult"),
+            ]
+        });
 
         return {
             "statisticsTitleAndTypeArr": this.spmConfig,

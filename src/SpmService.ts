@@ -424,7 +424,7 @@ export default class SpmService extends XSpmService {
     }
 
     async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""}) {
-        let {activityId, type, nick, startTime, endTime, page, size, extMatch} = this.data;
+        let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
         let title: string = customTitle || this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
         let filter = {
             activityId,
@@ -446,6 +446,10 @@ export default class SpmService extends XSpmService {
                 nick: 1,
                 time: 1,
                 desc: "$data.desc"
+            },
+            sort: {
+                time: -1,
+                ...sort
             }
         })
         this.response.data.behaviorList = [

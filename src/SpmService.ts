@@ -32,7 +32,9 @@ export default class SpmService extends XSpmService {
             this.generateOptions("抽奖", "lottery"),
         ]
         // this.prizeExtFilter = {};
-        // this.prizeSort = {};
+        this.prizeSort = {
+            time: -1
+        };
         this.addWinnerExport("中奖数据");
         this.addAllSpmUserNickExport();
         this.addAllSpmUserNickSelect()

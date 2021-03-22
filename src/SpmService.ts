@@ -454,6 +454,7 @@ export default class SpmService extends XSpmService {
                 ...sort
             }
         })
+        this.response.data.total = rs.total;
         this.response.data.behaviorList = [
             {
                 "behaviorInformationArr": [

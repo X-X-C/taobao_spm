@@ -151,6 +151,9 @@ exports.selectUiTitleAndType = async (context) => {
     app.config.globalActivity = false;
     return await app.run(async function () {
         app.response.data = app.getService(SpmService).baseData;
+        app.response.data.isWhite = !!app.db("whiteList").count({
+            list: context.userNick
+        });
     });
 }
 

@@ -1,10 +1,9 @@
 import App from "../base/App";
-import Utils from "../base/utils/Utils";
-import TopService from "../base/service/TopService";
-import BaseDao from "../base/dao/BaseDao";
 import XSpmService from "../base/service/XSpmService";
+import Utils from "../base/utils/Utils";
+import BaseDao from "../base/dao/BaseDao";
+import TopService from "../base/service/TopService";
 
-type generateParameterType = { key: string, type?: string, title: string }
 
 export default class SpmService extends XSpmService {
     constructor(app: App) {
@@ -14,8 +13,10 @@ export default class SpmService extends XSpmService {
     get baseData() {
         let {spmFun} = this;
         this.spmConfig = [
-            {title: "", type: "", fun: spmFun.A}
-        ]
+            {title: "PV", type: "view", fun: spmFun.A},
+            {title: "UV", type: "view", fun: spmFun.A},
+            {title: "newUV", type: "view", fun: spmFun.A},
+        ];
         this.prizeConfig = [
             {title: "ID", type: "nick", targetField: "nick"},
             {title: "奖品名", type: "prizeName", targetField: "prizeName"},
@@ -28,13 +29,10 @@ export default class SpmService extends XSpmService {
             {title: "详细地址", type: "desc", targetField: "info.desc"}
         ]
         this.prizeOptions = [
-            this.generateOptions("排行榜", "rank"),
-            this.generateOptions("抽奖", "lottery"),
+            // this.generateOptions("排行榜", "rank"),
+            // this.generateOptions("抽奖", "lottery"),
         ]
-        // this.prizeExtFilter = {};
-        this.prizeSort = {
-            time: -1
-        };
+        // this.prizeParameter = {}
         this.addWinnerExport("中奖数据");
         this.addAllSpmUserNickExport();
         this.addAllSpmUserNickSelect()
@@ -50,140 +48,95 @@ export default class SpmService extends XSpmService {
         });
 
         return {
-            "statisticsTitleAndTypeArr": this.spmConfig,
-            "exportStatistics": this.spmExportConfig,
-            "selectWinnerTitleAndTypeArr": this.winnerSelectConfig,
-            "winnerTitleAndTypeArr": this.exportWinnerConfig,
-            "userNicksExportsArr": this.userNickExportConfig,
-            "behaviorTitleAndTypeArr": this.userNickSelectConfig,
-            "reissueArr": this.reissueConfig
+            statisticsTitleAndTypeArr: this.statisticsTitleAndTypeArr,
+            exportStatistics: this.exportStatistics,
+            selectWinnerTitleAndTypeArr: this.selectWinnerTitleAndTypeArr,
+            winnerTitleAndTypeArr: this.winnerTitleAndTypeArr,
+            userNicksExportsArr: this.userNicksExportsArr,
+            behaviorTitleAndTypeArr: this.behaviorTitleAndTypeArr,
+            reissueArr: this.reissueArr
         }
     }
 
-    spmFun = {
+    private _statisticsTitleAndTypeArr: statisticsTitleAndTypeArr[] = [];
+    private _exportStatistics: exportStatistics;
+    private _winnerTitleAndTypeArr: winnerTitleAndTypeArr[] = [];
+    private _userNicksExportsArr: userNicksExportsArr[] = [];
+    private _behaviorTitleAndTypeArr: behaviorTitleAndTypeArr[] = [];
+    private _reissueArr: reissueArr[] = [];
+    private _prizeOptions: option[] = [];
+    private _prizeConfig: prizeOption[] = [];
+    private _prizeParameter: {
+        sort?: any
+        filter?: any
+    };
+    private spmFun: { [key: string]: spmFun } = {
         A: "selectSpm",
         B: "selectSpmDis",
         C: "selectSpmDisTotal"
-    };
+    }
+    private _spmConfig: generateSpmConfig[] = [];
 
-    _: any = {
-        prizeOptions: [],
-        prizeConfig: [],
-        spmConfig: [
-            {
-                "title": "PV",
-                "type": "PV",
-                "parameter": {"type": "view"},
-                "fun": this.spmFun.A
-            },
-            {
-                "title": "UV",
-                "type": "UV",
-                "parameter": {"type": "view"},
-                "fun": this.spmFun.B
-            },
-            {
-                "title": "newUV",
-                "type": "newUV",
-                "parameter": {"type": "view"},
-                "fun": this.spmFun.C
-            }
-        ],
-        prizeFixParameter: {},
-        exportWinnerConfig: [],
-        userNicksExportConfig: [],
-        userNickSelectConfig: [],
-        reissueConfig: []
+    get spmConfig(): generateSpmConfig[] {
+        return this._spmConfig;
     }
 
-    get spmConfig() {
-        return this._.spmConfig;
+    set spmConfig(value: generateSpmConfig[]) {
+        this._spmConfig = this._spmConfig.concat(value);
+        this.addStatisticsData(this._spmConfig);
     }
 
-    get prizeOptions() {
-        return this._.prizeOptions;
+    get prizeOptions(): option[] {
+        return this._prizeOptions;
     }
 
-    get prizeConfig() {
-        return this._.prizeConfig;
+    set prizeOptions(value: option[]) {
+        this._prizeOptions = value;
     }
 
-    get prizeParameter() {
-        return this._.prizeFixParameter;
+    get prizeConfig(): prizeOption[] {
+        return this._prizeConfig;
     }
 
-    get exportWinnerConfig() {
-        return this._.exportWinnerConfig;
+    set prizeConfig(value: prizeOption[]) {
+        this._prizeConfig = value;
     }
 
-    get userNickSelectConfig() {
-        return this._.userNickSelectConfig;
+    get prizeParameter(): { sort?: any; filter?: any } {
+        return this._prizeParameter;
     }
 
-    get userNickExportConfig() {
-        return this._.userNicksExportConfig;
+    set prizeParameter(value: { sort?: any; filter?: any }) {
+        this._prizeParameter = value;
     }
 
-    get reissueConfig() {
-        return this._.reissueConfig;
+    get statisticsTitleAndTypeArr(): statisticsTitleAndTypeArr[] {
+        return this._statisticsTitleAndTypeArr;
     }
 
-    set prizeParameter(v) {
-        this._.prizeFixParameter = v;
+    addStatisticsData(value: generateSpmConfig[]) {
+        this._statisticsTitleAndTypeArr = this.generateSpm(value);
     }
 
-    set prizeOptions(v) {
-        this._.prizeOptions = v;
+    get exportStatistics(): exportStatistics {
+        return this._exportStatistics;
     }
 
-    set prizeConfig(v) {
-        this._.prizeConfig = v;
+    set exportStatistics(value: exportStatistics) {
+        this._exportStatistics = {
+            fixParameter: {},
+            title: "导出统计数据",
+            fun: "exportStatistics",
+            ...value
+        };
     }
 
-    set prizeSort(v) {
-        this._.prizeFixParameter.sort = v;
-    }
-
-    set prizeExtFilter(v) {
-        this._.prizeFixParameter.filter = v;
-    }
-
-    set spmConfig(config: any[]) {
-        this._.spmConfig.push(...this.generateSpm(config));
-    }
-
-    set exportWinnerConfig(v) {
-        this._.exportWinnerConfig.push(v);
-    }
-
-    set userNickExportConfig(v) {
-        this._.userNicksExportConfig.push(v);
-    }
-
-    set userNickSelectConfig(v) {
-        this._.userNickSelectConfig.push(v);
-    }
-
-    set reissueConfig(v) {
-        this._.reissueConfig.push(v);
-    }
-
-    get spmExportConfig() {
-        return {
-            "fixParameter": {},//固定参数，调用接口会默认传入内部所有参数
-            "fun": "exportStatistics",//接口名称
-            "title": "导出"
-        }
-    }
-
-    get winnerSelectConfig() {
+    get selectWinnerTitleAndTypeArr() {
         return {
             "title": "中奖数据查询", //标题
             "showTime": true,//是否需要时间查询
             "fun": "selectPrize",//云函数方法名，自定义
             "fixParameter": {
-                // sort: {},
-                // filter: {},
                 winnerTitleAndTypeArr: this.prizeConfig,
                 ...this.prizeParameter
             },//固定参数，查询接口时候会默认带上内部所有参数
@@ -200,6 +153,131 @@ export default class SpmService extends XSpmService {
         }
     }
 
+    get winnerTitleAndTypeArr(): winnerTitleAndTypeArr[] {
+        return this._winnerTitleAndTypeArr;
+    }
+
+    addWinnerExport(title, {
+        prizeConfig = this.prizeConfig,
+        prizeOptions = this.prizeOptions,
+        parameter = this.prizeParameter,
+        fun = ""
+    } = {}) {
+        this._winnerTitleAndTypeArr.push({
+            title: title,
+            export: {
+                title: "类型", //标题
+                showTime: true,//是否需要时间查询
+                fun: fun || "exportsPrize",//云函数方法名，自定义
+                fixParameter: {
+                    winnerTitleAndTypeArr: prizeConfig,
+                    sort: {
+                        time: -1
+                    },
+                    ...parameter
+                },//固定参数，查询接口时候会默认带上内部所有参数
+                parameter: {  //动态参数，比如 type:'type值1'
+                    type: {
+                        type: "radio", //单选框
+                        title: "类型标题",
+                        options: [
+                            ...prizeOptions
+                        ]
+                    }
+                }
+            }
+        });
+    }
+
+    get userNicksExportsArr(): userNicksExportsArr[] {
+        return this._userNicksExportsArr;
+    }
+
+    addUserNickExport(title, {
+        parameter = {},
+        options = [],
+        fun = ""
+    } = {}) {
+        this.userNicksExportsArr.push({
+            title: title,
+            export: {
+                title: title, //标题
+                showTime: true,//是否需要时间查询
+                fun: fun || "exportsNick",//云函数方法名，自定义
+                fixParameter: {
+                    ...parameter
+                },//固定参数，查询接口时候会默认带上内部所有参数
+                parameter: {  //动态参数，比如 type:'type值1'
+                    type: {
+                        type: "radio", //单选框
+                        title: "类型标题",
+                        options: [
+                            ...options
+                        ]
+                    }
+                }
+            }
+        })
+    }
+
+    get behaviorTitleAndTypeArr(): behaviorTitleAndTypeArr[] {
+        return this._behaviorTitleAndTypeArr;
+    }
+
+    addUserNickSelect(title, {
+        parameter = {},
+        options = [],
+        fun = <"defaultNickSelect" | "assistNickSelect">""
+    } = {}) {
+        this.behaviorTitleAndTypeArr.push({
+                "title": title,
+                "export": {
+                    "title": title, //标题
+                    "showTime": true,//是否需要时间查询
+                    "fun": fun || "selectBehavior",//云函数方法名，自定义
+                    "fixParameter": parameter,//固定参数，查询接口时候会默认带上内部所有参数
+                    "parameter": {  //动态参数，比如 type:'type值1'
+                        "type": {
+                            "type": "radio", //单选框
+                            "title": "类型标题",
+                            "options": [
+                                ...options
+                            ]
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+    get reissueArr(): reissueArr[] {
+        return this._reissueArr;
+    }
+
+    addReissueConfig(title, {
+        fixParameter = {},
+        parameter = <generateParameterType[]>[],
+        fun
+    }) {
+        this.reissueArr.push({
+            "title": title,
+            "export": {
+                "showTime": true,
+                "fixParameter": fixParameter,
+                "parameter": this.generateReissueParameter(parameter),
+                "title": "补发类型",
+                "fun": fun
+            }
+        })
+    }
+
+    generateOptions(title, value): option {
+        return {
+            title,
+            value
+        }
+    }
+
     generateSpm(config: any[]) {
         let {spmFun} = this;
 
@@ -207,9 +285,9 @@ export default class SpmService extends XSpmService {
             return {
                 title: title,
                 type: (() => {
-                    if (funName === spmFun.B) {
+                    if (funName === spmFun.B && title !== "UV") {
                         return type + "Count";
-                    } else if (funName === spmFun.C) {
+                    } else if (funName === spmFun.C && title !== "newUV") {
                         return type + "NewCount";
                     } else {
                         return type;
@@ -227,14 +305,7 @@ export default class SpmService extends XSpmService {
         return finalData;
     }
 
-    generateOptions(title, value) {
-        return {
-            title,
-            value
-        }
-    }
-
-    generateParameter(parameterArr: generateParameterType[]) {
+    generateReissueParameter(parameterArr: generateParameterType[]) {
         let o = {};
         for (const p of parameterArr) {
             o[p.key] = {
@@ -245,117 +316,15 @@ export default class SpmService extends XSpmService {
         return o;
     }
 
-    addWinnerExport(title, {
-        prizeConfig = this.prizeConfig,
-        prizeOptions = this.prizeOptions,
-        parameter = this.prizeParameter,
-        fun = ""
-    } = {}) {
-        let p = {
-            "title": title,
-            "export": {
-                "title": "类型", //标题
-                "showTime": true,//是否需要时间查询
-                "fun": fun || "exportsPrize",//云函数方法名，自定义
-                "fixParameter": {
-                    winnerTitleAndTypeArr: prizeConfig,
-                    ...parameter
-                },//固定参数，查询接口时候会默认带上内部所有参数
-                "parameter": {  //动态参数，比如 type:'type值1'
-                    "type": {
-                        "type": "radio", //单选框
-                        "title": "类型标题",
-                        "options": [
-                            ...prizeOptions
-                        ]
-                    }
-                }
-            }
-        }
-        this.exportWinnerConfig = p;
-        return p;
-    }
-
-    addUserNickExport(title, {
-        parameter = {},
-        options = [],
-        fun = ""
-    } = {}) {
-        let e = {
-            "title": title,
-            "export": {
-                "title": title, //标题
-                "showTime": true,//是否需要时间查询
-                "fun": fun || "exportsNick",//云函数方法名，自定义
-                "fixParameter": {
-                    // filter: {
-                    //     //额外查询
-                    // }
-                    ...parameter
-                },//固定参数，查询接口时候会默认带上内部所有参数
-                "parameter": {  //动态参数，比如 type:'type值1'
-                    "type": {
-                        "type": "radio", //单选框
-                        "title": "类型标题",
-                        "options": [
-                            ...options
-                        ]
-                    }
-                }
-            }
-        }
-        this.userNickExportConfig = e;
-        return e;
-    }
-
-    addUserNickSelect(title, {
-        parameter = {},
-        options = [],
-        fun = <"defaultNickSelect" | "assistNickSelect">""
-    } = {}) {
-        let u = {
-            "title": title,
-            "export": {
-                "title": title, //标题
-                "showTime": true,//是否需要时间查询
-                "fun": fun || "selectBehavior",//云函数方法名，自定义
-                "fixParameter": parameter,//固定参数，查询接口时候会默认带上内部所有参数
-                "parameter": {  //动态参数，比如 type:'type值1'
-                    "type": {
-                        "type": "radio", //单选框
-                        "title": "类型标题",
-                        "options": [
-                            ...options
-                        ]
-                    }
-                }
-            }
-        }
-        this.userNickSelectConfig = u;
-        return u;
-    }
-
-    addReissueConfig(title, {
-        fixParameter = {},
-        parameter = <generateParameterType[]>[],
-        fun
-    }) {
-        let r = {
-            "title": title,
-            "export": {
-                "showTime": true,
-                "fixParameter": fixParameter,
-                "parameter": this.generateParameter(parameter),
-                "title": "补发类型",
-                "fun": fun
-            }
-        }
-        this.reissueConfig = r;
-        return r;
+    addAllSpmUserNickExport() {
+        let options = this.spmConfig.map(v => this.generateOptions(v.title, v.type));
+        return this.addUserNickExport("行为数据", {
+            options
+        });
     }
 
     addAllSpmUserNickSelect() {
-        let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
+        let options = this.spmConfig.map(v => this.generateOptions(v.title, v.type));
         return this.addUserNickSelect("行为数据", {
             options,
             fun: "defaultNickSelect"
@@ -376,13 +345,6 @@ export default class SpmService extends XSpmService {
             fun: "assistNickSelect"
         });
         return options;
-    }
-
-    addAllSpmUserNickExport() {
-        let options = this.spmConfig.map(v => this.generateOptions(v.title, v.parameter.type));
-        return this.addUserNickExport("行为数据", {
-            options
-        });
     }
 
     addPointReissue() {
@@ -425,7 +387,8 @@ export default class SpmService extends XSpmService {
         });
     }
 
-    async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""}) {
+
+    async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""} = {}) {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
         let title: string = customTitle || this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
         let filter = {
@@ -533,7 +496,7 @@ export default class SpmService extends XSpmService {
                 })
                 break;
             default:
-                await this.defaultNickSelect({})
+                await this.defaultNickSelect()
         }
     }
 

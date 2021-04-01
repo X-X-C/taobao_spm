@@ -148,7 +148,7 @@ exports.commonReissue = async (context) => {
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");
-    app.runConfig.setGlobalActivity;
+    app.set.globalActivity;
     return await app.run(async function () {
         app.response.data = app.getService(SpmService).baseData;
         app.response.data.isWhite = !!app.db("whiteList").count({

@@ -44,6 +44,7 @@ export default class SpmService extends XSpmService {
                 // this.generateOptions("分数变更", "_score"),
                 // this.generateOptions("抽奖次数变更", "_lotteryCount"),
                 // this.generateOptions("抽奖信息", "_lotteryResult"),
+                // this.generateOptions("领奖信息", "_receivePrize"),
             ],
             fun: "defaultNickSelect"
         });

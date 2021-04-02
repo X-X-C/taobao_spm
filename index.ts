@@ -9,6 +9,22 @@ exports.main = async (context) => {
         // do...
     });
 }
+
+
+// @ts-ignore
+exports.createTb = async (context) => {
+    const app = new App(context, "createTb");
+    app.runNeedParams = {
+        tb: "string"
+    }
+    return await app.run(async function () {
+        if (this.ok === true) {
+            app.response.data = await context.cloud.db.createCollection(this.tb);
+        }
+    });
+}
+
+
 // @ts-ignore
 exports.aggregate = async (context) => {
     const app = new App(context, "aggregate");

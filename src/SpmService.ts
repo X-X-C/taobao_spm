@@ -75,7 +75,8 @@ export default class SpmService extends XSpmService {
     private spmFun: { [key: string]: spmFun } = {
         A: "selectSpm",
         B: "selectSpmDis",
-        C: "selectSpmDisTotal"
+        C: "selectSpmDisTotal",
+        D: "selectSpmSum"
     }
     private _spmConfig: generateSpmConfig[] = [];
 
@@ -283,26 +284,32 @@ export default class SpmService extends XSpmService {
     generateSpm(config: any[]) {
         let {spmFun} = this;
 
-        function baseSpm(title, type, funName) {
+        function baseSpm(title, type, funName, ext?) {
             return {
                 title: title,
                 type: (() => {
-                    if (funName === spmFun.B && title !== "UV") {
-                        return type + "Count";
-                    } else if (funName === spmFun.C && title !== "newUV") {
-                        return type + "NewCount";
+                    if (["PV", "UV", "newUV"].indexOf(title) !== -1) {
+                        return title;
                     } else {
-                        return type;
+                        if (funName === spmFun.B) {
+                            return type + "Count";
+                        } else if (funName === spmFun.C) {
+                            return type + "NewCount";
+                        } else if (funName === spmFun.D) {
+                            return type + "Sum";
+                        } else {
+                            return type;
+                        }
                     }
                 })(),
-                parameter: {"type": type},
+                parameter: {"type": type, ...ext},
                 fun: funName
             }
         }
 
         let finalData = [];
         for (let c of config) {
-            finalData.push(baseSpm(c.title, c.type, c.fun));
+            finalData.push(baseSpm(c.title, c.type, c.fun, c.ext));
         }
         return finalData;
     }

@@ -134,7 +134,8 @@ interface prizeOption {
 interface generateSpmConfig {
     title: string,
     type: string,
-    fun: spmFun
+    fun: spmFun,
+    ext?: any
 }
 
 type generateParameterType = { key: string, type?: string, title: string }

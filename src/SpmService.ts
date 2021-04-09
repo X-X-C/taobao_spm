@@ -422,7 +422,7 @@ export default class SpmService extends XSpmService {
                 desc: "$data.desc"
             },
             sort: {
-                time: -1,
+                timestamp: -1,
                 ...sort
             }
         })

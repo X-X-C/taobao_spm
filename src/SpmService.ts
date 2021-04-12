@@ -513,14 +513,19 @@ export default class SpmService extends XSpmService {
         let {type, nick} = this.data;
         let dao = new BaseDao<any>(this.context);
         dao.initTb("users");
-        let user = await dao.get({
-            activityId: this.activityId,
-            nick,
-            //已授权用户
-            avatar: {
-                $ne: false
+        let user: any = await dao.aggregate([
+            {
+                $match: {
+                    activityId: this.activityId,
+                    nick,
+                    //已授权用户
+                    avatar: {
+                        $ne: false
+                    }
+                }
             }
-        });
+        ]);
+        user = user[0];
         if (!user) {
             this.response.set222("查无此人");
             return;

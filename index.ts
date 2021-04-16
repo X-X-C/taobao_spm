@@ -147,6 +147,14 @@ exports.defaultNickSelect = async (context) => {
 }
 
 // @ts-ignore
+exports.myNickExport = async (context) => {
+    const app = new App(context, "myNickExport");
+    return await app.run(async function () {
+        await app.getService(SpmService).myNickExport();
+    });
+}
+
+// @ts-ignore
 exports.assistNickSelect = async (context) => {
     const app = new App(context, "assistNickSelect");
     return await app.run(async function () {

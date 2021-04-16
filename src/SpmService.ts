@@ -204,7 +204,7 @@ export default class SpmService extends XSpmService {
         this.userNicksExportsArr.push({
             title: title,
             export: {
-                title: title, //标题
+                title: "类型", //标题
                 showTime: true,//是否需要时间查询
                 fun: fun || "exportsNick",//云函数方法名，自定义
                 fixParameter: {
@@ -235,7 +235,7 @@ export default class SpmService extends XSpmService {
         this.behaviorTitleAndTypeArr.push({
                 "title": title,
                 "export": {
-                    "title": title, //标题
+                    "title": "类型", //标题
                     "showTime": true,//是否需要时间查询
                     "fun": fun || "selectBehavior",//云函数方法名，自定义
                     "fixParameter": parameter,//固定参数，查询接口时候会默认带上内部所有参数
@@ -268,7 +268,7 @@ export default class SpmService extends XSpmService {
                 "showTime": true,
                 "fixParameter": fixParameter,
                 "parameter": this.generateReissueParameter(parameter),
-                "title": "补发类型",
+                "title": "类型",
                 "fun": fun
             }
         })
@@ -557,6 +557,98 @@ export default class SpmService extends XSpmService {
         }
         if (r.code !== 1) {
             this.response.message = Utils.toJson(r.data);
+        }
+    }
+
+    async myNickExport() {
+        let {exportIndex, startTime, endTime, type, activityId, exportSize, sort, filter} = this.data;
+        //白名单
+        let whiteListDao = new BaseDao<any>(this.context);
+        whiteListDao.initTb("whiteList");
+        let white = await whiteListDao.count({
+            list: this.nick
+        });
+        if (!white) {
+            this.response.message = "无权限";
+            this.response.success = false;
+            return;
+        }
+        exportIndex = exportIndex || 0;
+        exportSize = exportSize || 10000;
+        let match = {
+            activityId,
+            time: {
+                $gte: startTime,
+                $lte: endTime
+            },
+            type,
+            ...filter
+        }
+        Utils.cleanObj(match);
+        let openIds = await this.aggregate([
+            {
+                $match: match
+            },
+            {
+                $sort: {
+                    timestamp: -1,
+                    ...sort
+                }
+            },
+            {
+                $group: {
+                    _id: "$openId"
+                }
+            },
+            {
+                $skip: exportIndex * exportSize
+            },
+            {
+                $limit: exportSize
+            }
+        ])
+        let total = await this.aggregate([
+            {
+                $match: match
+            },
+            {
+                $group: {
+                    _id: "$openId"
+                }
+            },
+            {
+                $count: "count"
+            }
+        ])
+        total = total[0]?.count || 0;
+        let userDao = new BaseDao<any>(this.context);
+        userDao.initTb("users");
+        let nicks = await userDao.aggregate([
+            {
+                $match: {
+                    openId: {
+                        $in: openIds.map(v => v._id)
+                    },
+                    avatar: {
+                        $ne: false
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "淘宝ID": "$nick"
+                }
+            }
+        ])
+        let url = "暂无数据";
+        if (nicks.length > 0) {
+            let buffer = Utils.jsonToExcelBuffer(nicks);
+            url = await this.uploadFile(buffer, this.time().common.x + ".xlsx");
+        }
+        this.response.data = {
+            exportEnd: ((exportIndex * exportSize) + exportSize) >= total,
+            outUrl: url
         }
     }
 }

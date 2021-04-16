@@ -140,6 +140,7 @@ exports.selectBehavior = async (context) => {
 // @ts-ignore
 exports.defaultNickSelect = async (context) => {
     const app = new App(context, "defaultNickSelect");
+    app.set.globalActivity;
     return await app.run(async function () {
         await app.getService(SpmService).defaultNickSelect({});
     });

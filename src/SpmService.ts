@@ -400,6 +400,24 @@ export default class SpmService extends XSpmService {
     async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""} = {}) {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
         let title: string = customTitle || this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
+        let openId;
+        if (nick) {
+            let userDao: BaseDao<any> = new BaseDao(this.context);
+            userDao.initTb("users");
+            let user = await userDao.aggregate([
+                {
+                    $match: {
+                        activityId,
+                        nick
+                    }
+                },
+                {
+                    $limit: 1
+                }
+            ]);
+            openId = user?.[0]?.openId;
+            nick = "";
+        }
         let filter = {
             activityId,
             type,
@@ -408,6 +426,7 @@ export default class SpmService extends XSpmService {
                 $gte: startTime,
                 $lte: endTime
             },
+            openId,
             ...extMatch,
             ...customExtMatch
         }

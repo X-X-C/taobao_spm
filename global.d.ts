@@ -10,7 +10,7 @@ interface statisticsTitleAndTypeArr {
     fun: spmFun | string
 }
 
-type spmFun = "selectSpm" | "selectSpmDis" | "selectSpmDisTotal" | "selectSpmSum";
+type spmFun = "selectSpm" | "selectSpmDis" | "selectSpmDisTotal" | "selectSpmSum" | string
 
 interface exportStatistics {
     fixParameter: {

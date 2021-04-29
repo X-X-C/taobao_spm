@@ -1,15 +1,13 @@
-import App from "./base/App";
 // @ts-ignore
 import * as gmspm from "gm-spm";
 import SpmService from "./src/SpmService";
+import App from "./App";
 // @ts-ignore
 exports.main = async (context) => {
     const app = new App(context, "main");
     return await app.run(async function () {
-        // do...
     });
 }
-
 
 // @ts-ignore
 exports.createTb = async (context) => {
@@ -90,7 +88,6 @@ exports.spm = async (context) => {
     return await gmspm.spm.spm(context);
 }
 
-
 // @ts-ignore
 exports.selectSpm = async (context) => {
     return await gmspm.spm.selectSpm(context);
@@ -140,7 +137,7 @@ exports.selectBehavior = async (context) => {
 // @ts-ignore
 exports.defaultNickSelect = async (context) => {
     const app = new App(context, "defaultNickSelect");
-    app.set.globalActivity;
+    app.before.globalActivity();
     return await app.run(async function () {
         await app.getService(SpmService).defaultNickSelect({});
     });
@@ -165,6 +162,7 @@ exports.assistNickSelect = async (context) => {
 // @ts-ignore
 exports.commonReissue = async (context) => {
     const app = new App(context, "commonReissue");
+    app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).commonReissue();
     });
@@ -173,12 +171,11 @@ exports.commonReissue = async (context) => {
 // @ts-ignore
 exports.selectUiTitleAndType = async (context) => {
     const app = new App(context, "selectUiTitleAndType");
-    app.set.globalActivity;
+    app.before.globalActivity();
+    app.before.whiteList();
     return await app.run(async function () {
         app.response.data = app.getService(SpmService).baseData;
-        app.response.data.isWhite = !!app.db("whiteList").count({
-            list: context.userNick
-        });
+        app.response.data.isWhite = app.isWhite;
     });
 }
 

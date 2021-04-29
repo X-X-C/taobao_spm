@@ -562,17 +562,6 @@ export default class SpmService extends XSpmService {
 
     async myNickExport() {
         let {exportIndex, startTime, endTime, type, activityId, exportSize, sort, filter} = this.data;
-        //白名单
-        let whiteListDao = new BaseDao<any>(this.context);
-        whiteListDao.initTb("whiteList");
-        let white = await whiteListDao.count({
-            list: this.nick
-        });
-        if (!white) {
-            this.response.message = "无权限";
-            this.response.success = false;
-            return;
-        }
         exportIndex = exportIndex || 0;
         exportSize = exportSize || 10000;
         let match = {

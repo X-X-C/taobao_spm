@@ -2,15 +2,17 @@
 import * as gmspm from "gm-spm";
 import SpmService from "./src/SpmService";
 import App from "./App";
-// @ts-ignore
-exports.main = async (context) => {
+
+
+export async function main(context) {
     const app = new App(context, "main");
     return await app.run(async function () {
+
     });
 }
 
-// @ts-ignore
-exports.createTb = async (context) => {
+
+export async function createTb(context) {
     const app = new App(context, "createTb");
     app.runNeedParams = {
         tb: "string"
@@ -23,8 +25,7 @@ exports.createTb = async (context) => {
 }
 
 
-// @ts-ignore
-exports.aggregate = async (context) => {
+export async function aggregate(context) {
     const app = new App(context, "aggregate");
     app.runNeedParams = {
         tb: "string",
@@ -35,8 +36,8 @@ exports.aggregate = async (context) => {
     });
 }
 
-// @ts-ignore
-exports.update = async (context) => {
+
+export async function update(context) {
     const app = new App(context, "update");
     app.runNeedParams = {
         tb: "string",
@@ -50,8 +51,8 @@ exports.update = async (context) => {
     });
 }
 
-// @ts-ignore
-exports.clean = async (context) => {
+
+export async function clean(context) {
     const app = new App(context, "clean");
     app.runNeedParams = {
         tb: "string"
@@ -68,8 +69,7 @@ exports.clean = async (context) => {
 }
 
 
-// @ts-ignore
-exports.insert = async (context) => {
+export async function insert(context) {
     const app = new App(context, "clean");
     app.runNeedParams = {
         tb: "string",
@@ -83,59 +83,58 @@ exports.insert = async (context) => {
 }
 
 
-// @ts-ignore
-exports.spm = async (context) => {
+export async function spm(context) {
     return await gmspm.spm.spm(context);
 }
 
-// @ts-ignore
-exports.selectSpm = async (context) => {
+
+export async function selectSpm(context) {
     return await gmspm.spm.selectSpm(context);
 }
 
-// @ts-ignore
-exports.selectSpmDis = async (context) => {
+
+export async function selectSpmDis(context) {
     return await gmspm.spm.selectSpmDis(context);
 }
 
-// @ts-ignore
-exports.selectSpmDisTotal = async (context) => {
+
+export async function selectSpmDisTotal(context) {
     return await gmspm.spm.selectSpmDisTotal(context);
 }
 
-// @ts-ignore
-exports.selectSpmSum = async (context) => {
+
+export async function selectSpmSum(context) {
     return await gmspm.spm.selectSpmSum(context);
 }
 
-// @ts-ignore
-exports.exportStatistics = async (context) => {
+
+export async function exportStatistics(context) {
     return await gmspm.spm.exportStatistics(context);
 }
 
-// @ts-ignore
-exports.selectPrize = async (context) => {
+
+export async function selectPrize(context) {
     return await gmspm.spm.selectPrize(context);
 }
 
-// @ts-ignore
-exports.exportsPrize = async (context) => {
+
+export async function exportsPrize(context) {
     return await gmspm.spm.exportsPrize(context);
 }
 
-// @ts-ignore
-exports.exportsNick = async (context) => {
+
+export async function exportsNick(context) {
     return await gmspm.spm.exportsNick(context);
 }
 
 //行为数据查询
-// @ts-ignore
-exports.selectBehavior = async (context) => {
+
+export async function selectBehavior(context) {
     return await gmspm.spm.selectBehavior(context);
 }
 
-// @ts-ignore
-exports.defaultNickSelect = async (context) => {
+
+export async function defaultNickSelect(context) {
     const app = new App(context, "defaultNickSelect");
     app.before.globalActivity();
     return await app.run(async function () {
@@ -143,24 +142,24 @@ exports.defaultNickSelect = async (context) => {
     });
 }
 
-// @ts-ignore
-exports.myNickExport = async (context) => {
+
+export async function myNickExport(context) {
     const app = new App(context, "myNickExport");
     return await app.run(async function () {
         await app.getService(SpmService).myNickExport();
     });
 }
 
-// @ts-ignore
-exports.assistNickSelect = async (context) => {
+
+export async function assistNickSelect(context) {
     const app = new App(context, "assistNickSelect");
     return await app.run(async function () {
         await app.getService(SpmService).assistNickSelect();
     });
 };
 
-// @ts-ignore
-exports.commonReissue = async (context) => {
+
+export async function commonReissue(context) {
     const app = new App(context, "commonReissue");
     app.before.checkWhite();
     return await app.run(async function () {
@@ -168,8 +167,8 @@ exports.commonReissue = async (context) => {
     });
 };
 
-// @ts-ignore
-exports.selectUiTitleAndType = async (context) => {
+
+export async function selectUiTitleAndType(context) {
     const app = new App(context, "selectUiTitleAndType");
     app.before.globalActivity();
     app.before.whiteList();

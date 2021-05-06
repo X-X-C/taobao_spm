@@ -3,6 +3,7 @@ import XSpmService from "../base/service/XSpmService";
 import Utils from "../base/utils/Utils";
 import BaseDao from "../base/dao/BaseDao";
 import TopService from "../base/service/TopService";
+import BaseService from "../base/service/abstract/BaseService";
 
 
 export default class SpmService extends XSpmService {
@@ -410,6 +411,18 @@ export default class SpmService extends XSpmService {
             },
             ...extMatch,
             ...customExtMatch
+        }
+        if (nick) {
+            let userService = this.getService(BaseService);
+            userService.dao.initTb("users");
+            let user = await userService.get({
+                activityId,
+                nick
+            })
+            if (user) {
+                filter.nick = "";
+                filter.openId = user.openId;
+            }
         }
         Utils.cleanObj(filter);
         let rs: any = await this.pageList(filter, {

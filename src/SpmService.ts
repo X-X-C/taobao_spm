@@ -478,7 +478,7 @@ export default class SpmService extends XSpmService {
             page,
             size,
             sort: {
-                timestamp: -1,
+                time: -1,
                 ...sort
             }
         })

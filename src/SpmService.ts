@@ -4,6 +4,7 @@ import Utils from "../base/utils/Utils";
 import BaseDao from "../base/dao/BaseDao";
 import TopService from "../base/service/TopService";
 import BaseService from "../base/service/abstract/BaseService";
+import XErrorLogService from "../base/service/XErrorLogService";
 
 
 export default class SpmService extends XSpmService {
@@ -49,6 +50,14 @@ export default class SpmService extends XSpmService {
             ],
             fun: "defaultNickSelect"
         });
+
+        this.addUserNickSelect("日志", {
+            fun: "errorLogSelect",
+            options: [
+                this.generateOptions("错误", "error"),
+                this.generateOptions("警告", "logic"),
+            ]
+        })
 
         return {
             statisticsTitleAndTypeArr: this.statisticsTitleAndTypeArr,
@@ -231,7 +240,7 @@ export default class SpmService extends XSpmService {
     addUserNickSelect(title, {
         parameter = {},
         options = [],
-        fun = <"defaultNickSelect" | "assistNickSelect">""
+        fun = <"defaultNickSelect" | "assistNickSelect" | "errorLogSelect" | string>""
     } = {}) {
         this.behaviorTitleAndTypeArr.push({
                 "title": title,
@@ -446,6 +455,40 @@ export default class SpmService extends XSpmService {
                     ...rs.data.map(v => v.desc ? v.desc : `【${v.nick || "未授权用户"}】在【${v.time}】触发【${title}】`)
                 ],
                 "title": `${title ? `【${title}】` : ""}共${rs.total}条`,
+                "type": type
+            }
+        ]
+    }
+
+    async errorLogSelect() {
+        let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
+        let filter = {
+            activityId,
+            level: type,
+            nick,
+            time: {
+                $gte: startTime,
+                $lte: endTime
+            },
+            ...extMatch
+        }
+        Utils.cleanObj(filter);
+        let errorLogService = this.getService(XErrorLogService);
+        let rs: any = await errorLogService.pageList(filter, {
+            page,
+            size,
+            sort: {
+                timestamp: -1,
+                ...sort
+            }
+        })
+        this.response.data.total = rs.total;
+        this.response.data.behaviorList = [
+            {
+                "behaviorInformationArr": [
+                    ...rs.data.map(v => `异常API: 【${v.api}】，时间：【${v.time}】，信息：${v.message || "没有显式信息"}`)
+                ],
+                "title": `共${rs.total}条`,
                 "type": type
             }
         ]

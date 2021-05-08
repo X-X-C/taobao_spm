@@ -156,7 +156,7 @@ export async function assistNickSelect(context) {
     return await app.run(async function () {
         await app.getService(SpmService).assistNickSelect();
     });
-};
+}
 
 
 export async function commonReissue(context) {
@@ -164,6 +164,13 @@ export async function commonReissue(context) {
     app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).commonReissue();
+    });
+};
+
+export async function errorLogSelect(context) {
+    const app = new App(context, "errorLogSelect");
+    return await app.run(async function () {
+        await app.getService(SpmService).errorLogSelect();
     });
 };
 

@@ -486,7 +486,7 @@ export default class SpmService extends XSpmService {
         this.response.data.behaviorList = [
             {
                 "behaviorInformationArr": [
-                    ...rs.data.map(v => `异常API: 【${v.api}】，时间：【${v.time}】，用户：【${v.nick} - ${v.openId}】信息：${v.message || "没有显式信息"}`)
+                    ...rs.data.map(v => `异常API: 【${v.api}】，时间：【${v.time}】，用户：【${v.nick} - ${v.openId}】信息：${v.message || Utils.toJson(v.desc)}`)
                 ],
                 "title": `共${rs.total}条`,
                 "type": type

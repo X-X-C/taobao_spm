@@ -434,6 +434,9 @@ export default class SpmService extends XSpmService {
             }
         }
         Utils.cleanObj(filter);
+        if (type === "PV") {
+            this.dao.initTb("spm_pv");
+        }
         let rs: any = await this.pageList(filter, {
             page,
             size,

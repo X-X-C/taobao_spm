@@ -51,6 +51,13 @@ export default class SpmService extends XSpmService {
             fun: "defaultNickSelect"
         });
 
+        // this.addUserNickExport("所有用户ID导出", {
+        //     parameter: [
+        //         this.generateOptions("用户ID", "")
+        //     ],
+        //     fun: "allUserNickExport"
+        // })
+
         this.addUserNickSelect("日志", {
             fun: "errorLogSelect",
             options: [
@@ -689,6 +696,65 @@ export default class SpmService extends XSpmService {
                 }
             }
         ])
+        let url = "暂无数据";
+        if (nicks.length > 0) {
+            let buffer = Utils.jsonToExcelBuffer(nicks);
+            url = await this.uploadFile(buffer, this.time().common.x + ".xlsx");
+        }
+        this.response.data = {
+            exportEnd: ((exportIndex * exportSize) + exportSize) >= total,
+            outUrl: url
+        }
+    }
+
+
+    async allUserNickExport() {
+        let {exportIndex, startTime, endTime, activityId, exportSize} = this.data;
+        exportIndex = exportIndex || 0;
+        exportSize = exportSize || 20000;
+        let match = {
+            activityId,
+            createTime: {
+                $gte: startTime,
+                $lte: endTime
+            },
+            avatar: {
+                $ne: false
+            }
+        }
+        Utils.cleanObj(match);
+        this.dao.initTb("users");
+        let nicks = await this.aggregate([
+            {
+                $match: match
+            },
+            {
+                $sort: {
+                    createTime: -1
+                }
+            },
+            {
+                $skip: exportIndex * exportSize
+            },
+            {
+                $limit: exportSize
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "用户ID": "$nick"
+                }
+            }
+        ])
+        let total = await this.aggregate([
+            {
+                $match: match
+            },
+            {
+                $count: "count"
+            }
+        ])
+        total = total[0]?.count || 0;
         let url = "暂无数据";
         if (nicks.length > 0) {
             let buffer = Utils.jsonToExcelBuffer(nicks);

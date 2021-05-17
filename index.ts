@@ -174,6 +174,13 @@ export async function errorLogSelect(context) {
     });
 };
 
+export async function allUserNickExport(context) {
+    const app = new App(context, "allUserNickExport");
+    return await app.run(async function () {
+        await app.getService(SpmService).allUserNickExport();
+    });
+};
+
 
 export async function selectUiTitleAndType(context) {
     const app = new App(context, "selectUiTitleAndType");

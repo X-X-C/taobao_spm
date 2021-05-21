@@ -302,6 +302,7 @@ export default class SpmService extends XSpmService {
         let {spmFun} = this;
 
         function baseSpm(title, type, funName, ext?) {
+            title = title.replace(/[.]/g, "·");
             return {
                 title: title,
                 type: (() => {

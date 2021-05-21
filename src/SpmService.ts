@@ -428,7 +428,7 @@ export default class SpmService extends XSpmService {
             ...extMatch,
             ...customExtMatch
         }
-        if (nick) {
+        if (nick && Object.entries(customExtMatch).length === 0) {
             let userService = this.getService(BaseService);
             userService.dao.initTb("users");
             let user = await userService.get({

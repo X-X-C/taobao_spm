@@ -181,6 +181,13 @@ export async function allUserNickExport(context) {
     });
 };
 
+export async function userReissue(context) {
+    const app = new App(context, "allUserNickExport");
+    return await app.run(async function () {
+        await app.getService(SpmService).userReissue();
+    });
+};
+
 
 export async function selectUiTitleAndType(context) {
     const app = new App(context, "selectUiTitleAndType");

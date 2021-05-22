@@ -5,7 +5,10 @@ import BaseDao from "../base/dao/BaseDao";
 import TopService from "../base/service/TopService";
 import BaseService from "../base/service/abstract/BaseService";
 import XErrorLogService from "../base/service/XErrorLogService";
+import XMsgGenerate from "../base/utils/XMsgGenerate";
+import BaseEntity from "../base/entity/abstract/BaseEntity";
 
+const {uuid: {v4}, formatNum} = Utils;
 
 export default class SpmService extends XSpmService {
     constructor(app: App) {
@@ -20,15 +23,15 @@ export default class SpmService extends XSpmService {
             {title: "newUV", type: "view", fun: spmFun.A},
         ];
         this.prizeConfig = [
-            {title: "ID", type: "nick", targetField: "nick"},
-            {title: "奖品名", type: "prizeName", targetField: "prizeName"},
-            {title: "获得时间", type: "time", targetField: "time"},
-            {title: "姓名", type: "name", targetField: "info.name"},
-            {title: "电话", type: "tel", targetField: "info.tel"},
-            {title: "省", type: "province", targetField: "info.province"},
-            {title: "市", type: "city", targetField: "info.city"},
-            {title: "区", type: "district", targetField: "info.district"},
-            {title: "详细地址", type: "desc", targetField: "info.desc"}
+            {title: "ID", type: v4(), targetField: "nick"},
+            {title: "奖品名", type: v4(), targetField: "prizeName"},
+            {title: "获得时间", type: v4(), targetField: "time"},
+            {title: "姓名", type: v4(), targetField: "info.name"},
+            {title: "电话", type: v4(), targetField: "info.tel"},
+            {title: "省", type: v4(), targetField: "info.province"},
+            {title: "市", type: v4(), targetField: "info.city"},
+            {title: "区", type: v4(), targetField: "info.district"},
+            {title: "详细地址", type: v4(), targetField: "info.desc"}
         ]
         this.prizeOptions = [
             // this.generateOptions("排行榜", "rank"),
@@ -414,6 +417,20 @@ export default class SpmService extends XSpmService {
         });
     }
 
+    addUserReissue(title, field) {
+        this.addReissueConfig(title, {
+            fun: "userReissue",
+            fixParameter: {
+                field,
+                title
+            },
+            parameter: [
+                {key: "nick", title: "用户昵称"},
+                {key: "num", title: "变更数量"},
+            ]
+        });
+    }
+
 
     async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""} = {}) {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
@@ -708,7 +725,6 @@ export default class SpmService extends XSpmService {
         }
     }
 
-
     async allUserNickExport() {
         let {exportIndex, startTime, endTime, activityId, exportSize} = this.data;
         exportIndex = exportIndex || 0;
@@ -765,5 +781,51 @@ export default class SpmService extends XSpmService {
             exportEnd: ((exportIndex * exportSize) + exportSize) >= total,
             outUrl: url
         }
+    }
+
+    async userReissue() {
+        let {activityId, nick, num, field, title} = this.data;
+        if (!nick || !num) {
+            this.response.set222("请输入正确的参数");
+            return;
+        }
+        num = Number(num);
+        if (isNaN(num)) {
+            this.response.set222("请输入正确的数字");
+            return;
+        }
+        let db = this.app.db("users");
+        let filter = {
+            nick,
+            activityId
+        }
+        let user: BaseEntity & other = await db.find(filter)
+        user = user[0];
+        if (!user) {
+            this.response.set222("用户不存在");
+            return;
+        }
+        user = new BaseEntity().init(user);
+        let line = await db.updateMany(filter, {
+            $inc: {
+                [field]: num
+            }
+        });
+        if (line > 0) {
+            await this.simpleSpm("_" + field, {
+                desc: XMsgGenerate.baseInfo(user.nick, "补发" + title, title + formatNum(num), "剩余" + title + user.getValueFromKey(field)),
+                line
+            }, {
+                openId: user.openId,
+                nick: user.nick,
+                mixNick: user.mixNick
+            });
+            if (line !== 1) {
+                await this.getService(XErrorLogService).add({
+                    message: `补发影响行数超过一条，请检查。实际补发行数${line}行`
+                });
+            }
+        }
+        this.response.message = `补发成功，影响了${line}条数据`;
     }
 }

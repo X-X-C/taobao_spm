@@ -813,7 +813,7 @@ export default class SpmService extends XSpmService {
         });
         if (line > 0) {
             await this.simpleSpm("_" + field, {
-                desc: XMsgGenerate.baseInfo(user.nick, "补发" + title, title + formatNum(num), "剩余" + title + user.getValueFromKey(field)),
+                desc: XMsgGenerate.baseInfo(user.nick, "补发" + title, title + formatNum(num), "剩余" + title + (user.getValueFromKey(field) + num)),
                 line
             }, {
                 openId: user.openId,

@@ -523,14 +523,28 @@ export default class SpmService extends XSpmService {
     }
 
     async assistNickSelect() {
-        let {type, nick} = this.data, trulyType = "assistAll";
+        let {type, nick, activityId} = this.data, trulyType = "assistAll";
         let title = this.addAssistUserNickSelect().find(v => v.value === type)?.title;
+        let targetOpenId;
+        if (nick) {
+            let userService = this.getService(BaseService);
+            userService.dao.initTb("users");
+            let user = await userService.get({
+                activityId,
+                nick
+            })
+            if (user) {
+                targetOpenId = user.openId;
+                nick = "";
+            }
+        }
         switch (type) {
             case "all":
                 await this.defaultNickSelect({
                     customExtMatch: {
                         nick: "",
                         "data.inviter.nick": nick,
+                        "data.inviter.openId": targetOpenId,
                         type: trulyType
                     },
                     customTitle: title
@@ -541,6 +555,7 @@ export default class SpmService extends XSpmService {
                     customExtMatch: {
                         nick: "",
                         "data.inviter.nick": nick,
+                        "data.inviter.openId": targetOpenId,
                         "data.code": 200,
                         type: trulyType
                     },
@@ -552,6 +567,7 @@ export default class SpmService extends XSpmService {
                     customExtMatch: {
                         nick: "",
                         "data.inviter.nick": nick,
+                        "data.inviter.openId": targetOpenId,
                         type: trulyType,
                         "data.code": {
                             $ne: 200
@@ -563,7 +579,9 @@ export default class SpmService extends XSpmService {
             case "allInvite":
                 await this.defaultNickSelect({
                     customExtMatch: {
-                        type: trulyType
+                        type: trulyType,
+                        nick,
+                        openId: targetOpenId,
                     },
                     customTitle: title
                 })
@@ -572,6 +590,8 @@ export default class SpmService extends XSpmService {
                 await this.defaultNickSelect({
                     customExtMatch: {
                         type: trulyType,
+                        nick,
+                        openId: targetOpenId,
                         "data.code": 200,
                     },
                     customTitle: title
@@ -581,6 +601,8 @@ export default class SpmService extends XSpmService {
                 await this.defaultNickSelect({
                     customExtMatch: {
                         type: trulyType,
+                        nick,
+                        openId: targetOpenId,
                         "data.code": {
                             $ne: 200
                         }

@@ -828,6 +828,11 @@ export default class SpmService extends XSpmService {
             return;
         }
         user = new BaseEntity().init(user);
+        //目标字段不是数字
+        if (!Utils.isNumber(user.getValueFromKey(field))) {
+            this.response.set222("配置错误");
+            return;
+        }
         let line = await db.updateMany(filter, {
             $inc: {
                 [field]: num

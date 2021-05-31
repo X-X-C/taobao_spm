@@ -37,7 +37,7 @@ export default class SpmService extends XSpmService {
             // this.generateOptions("排行榜", "rank"),
             // this.generateOptions("抽奖", "lottery"),
         ]
-        // this.prizeParameter = {}
+        this.prizeParameter = {}
         this.exportStatistics = <exportStatistics>{};
         this.addWinnerExport("中奖数据");
         this.addAllSpmUserNickExport();
@@ -125,11 +125,11 @@ export default class SpmService extends XSpmService {
         this._prizeConfig = value;
     }
 
-    get prizeParameter(): { sort?: any; filter?: any } {
+    get prizeParameter(): { sort?: any; filter?: any; [key: string]: any } {
         return this._prizeParameter;
     }
 
-    set prizeParameter(value: { sort?: any; filter?: any }) {
+    set prizeParameter(value: { sort?: any; filter?: any; [key: string]: any }) {
         this._prizeParameter = value;
     }
 

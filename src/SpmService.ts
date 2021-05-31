@@ -72,7 +72,7 @@ export default class SpmService extends XSpmService {
         return {
             statisticsTitleAndTypeArr: this.statisticsTitleAndTypeArr,
             exportStatistics: this.exportStatistics,
-            selectWinnerTitleAndTypeArr: this.selectWinnerTitleAndTypeArr,
+            selectWinnerTitleAndTypeArr: this.selectWinnerTitleAndTypeArr(),
             winnerTitleAndTypeArr: this.winnerTitleAndTypeArr,
             userNicksExportsArr: this.userNicksExportsArr,
             behaviorTitleAndTypeArr: this.behaviorTitleAndTypeArr,
@@ -154,11 +154,16 @@ export default class SpmService extends XSpmService {
         };
     }
 
-    get selectWinnerTitleAndTypeArr() {
+    selectWinnerTitleAndTypeArr(
+        {
+            showTime = true,
+            fun = ""
+        } = {}
+    ) {
         return {
             "title": "中奖数据查询", //标题
-            "showTime": true,//是否需要时间查询
-            "fun": "selectPrize",//云函数方法名，自定义
+            "showTime": showTime,//是否需要时间查询
+            "fun": fun || "selectPrize",//云函数方法名，自定义
             "fixParameter": {
                 winnerTitleAndTypeArr: this.prizeConfig,
                 ...this.prizeParameter
@@ -184,13 +189,14 @@ export default class SpmService extends XSpmService {
         prizeConfig = this.prizeConfig,
         prizeOptions = this.prizeOptions,
         parameter = this.prizeParameter,
-        fun = ""
+        fun = <"myWinnerExport" | string>"",
+        showTime = true
     } = {}) {
         this._winnerTitleAndTypeArr.push({
             title: title,
             export: {
                 title: "类型", //标题
-                showTime: true,//是否需要时间查询
+                showTime,//是否需要时间查询
                 fun: fun || "exportsPrize",//云函数方法名，自定义
                 fixParameter: {
                     winnerTitleAndTypeArr: prizeConfig,
@@ -219,13 +225,14 @@ export default class SpmService extends XSpmService {
     addUserNickExport(title, {
         parameter = {},
         options = [],
-        fun = ""
+        fun = "",
+        showTime = true
     } = {}) {
         this.userNicksExportsArr.push({
             title: title,
             export: {
                 title: "类型", //标题
-                showTime: true,//是否需要时间查询
+                showTime,//是否需要时间查询
                 fun: fun || "exportsNick",//云函数方法名，自定义
                 fixParameter: {
                     ...parameter
@@ -250,13 +257,14 @@ export default class SpmService extends XSpmService {
     addUserNickSelect(title, {
         parameter = {},
         options = [],
-        fun = <"defaultNickSelect" | "assistNickSelect" | "errorLogSelect" | string>""
+        fun = <"defaultNickSelect" | "assistNickSelect" | "errorLogSelect" | string>"",
+        showTime = true
     } = {}) {
         this.behaviorTitleAndTypeArr.push({
                 "title": title,
                 "export": {
                     "title": "类型", //标题
-                    "showTime": true,//是否需要时间查询
+                    "showTime": showTime,//是否需要时间查询
                     "fun": fun || "selectBehavior",//云函数方法名，自定义
                     "fixParameter": parameter,//固定参数，查询接口时候会默认带上内部所有参数
                     "parameter": {  //动态参数，比如 type:'type值1'
@@ -855,5 +863,53 @@ export default class SpmService extends XSpmService {
             }
         }
         this.response.message = `补发成功，影响了${line}条数据`;
+    }
+
+    async myWinnerExport() {
+        let {type, exportIndex, winnerTitleAndTypeArr, sort, filter, startTime, endTime, size} = this.data;
+        let match = {
+            activityId: this.activityId,
+            type,
+            time: {
+                $gte: startTime,
+                $lte: endTime
+            },
+            ...filter
+        }
+        Utils.cleanObj(match);
+        let project = {
+            _id: 0
+        };
+        winnerTitleAndTypeArr.map(v => project[v.title] = "$" + v.targetField);
+        let count = await this.app.db("prizes").count(match);
+        let list = await this.app.db("prizes").aggregate([
+            {
+                $match: match
+            },
+            {
+                $sort: {
+                    time: -1,
+                    ...sort
+                }
+            },
+            {
+                $skip: exportIndex * size
+            },
+            {
+                $limit: size
+            },
+            {
+                $project: project
+            }
+        ]);
+        let url = "暂无数据";
+        if (list.length > 0) {
+            let buffer = Utils.jsonToExcelBuffer(list);
+            url = await this.uploadFile(buffer, this.time().common.x + ".xlsx");
+        }
+        this.response.data = {
+            exportEnd: ((exportIndex * size) + size) >= count,
+            outUrl: url
+        }
     }
 }

@@ -188,6 +188,12 @@ export async function userReissue(context) {
     });
 };
 
+export async function myWinnerExport(context) {
+    const app = new App(context, "myWinnerExport");
+    return await app.run(async function () {
+        await app.getService(SpmService).myWinnerExport();
+    });
+};
 
 export async function selectUiTitleAndType(context) {
     const app = new App(context, "selectUiTitleAndType");

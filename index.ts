@@ -145,6 +145,7 @@ export async function defaultNickSelect(context) {
 
 export async function myNickExport(context) {
     const app = new App(context, "myNickExport");
+    app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).myNickExport();
     });
@@ -169,6 +170,7 @@ export async function commonReissue(context) {
 
 export async function errorLogSelect(context) {
     const app = new App(context, "errorLogSelect");
+    app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).errorLogSelect();
     });
@@ -176,6 +178,7 @@ export async function errorLogSelect(context) {
 
 export async function allUserNickExport(context) {
     const app = new App(context, "allUserNickExport");
+    app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).allUserNickExport();
     });
@@ -183,6 +186,7 @@ export async function allUserNickExport(context) {
 
 export async function userReissue(context) {
     const app = new App(context, "allUserNickExport");
+    app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).userReissue();
     });
@@ -190,6 +194,7 @@ export async function userReissue(context) {
 
 export async function myWinnerExport(context) {
     const app = new App(context, "myWinnerExport");
+    app.before.checkWhite();
     return await app.run(async function () {
         await app.getService(SpmService).myWinnerExport();
     });

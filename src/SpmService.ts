@@ -1,4 +1,3 @@
-import App from "../base/App";
 import XSpmService from "../base/service/XSpmService";
 import Utils from "../base/utils/Utils";
 import BaseDao from "../base/dao/BaseDao";
@@ -7,6 +6,8 @@ import BaseService from "../base/service/abstract/BaseService";
 import XErrorLogService from "../base/service/XErrorLogService";
 import XMsgGenerate from "../base/utils/XMsgGenerate";
 import BaseEntity from "../base/entity/abstract/BaseEntity";
+import {before, exp} from "../base/utils/Annotation";
+import App, {Before} from "../App";
 
 const {uuid: {v4}, formatNum} = Utils;
 
@@ -14,6 +15,8 @@ export default class SpmService extends XSpmService {
     constructor(app: App) {
         super(app)
     }
+
+    app: App;
 
     get baseData() {
         let {spmFun} = this;
@@ -439,7 +442,9 @@ export default class SpmService extends XSpmService {
         });
     }
 
-
+    /*EXPORT*/
+    @before(Before.prototype.globalActivity)
+    @exp()
     async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""} = {}) {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
         let title: string = customTitle || this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
@@ -496,6 +501,8 @@ export default class SpmService extends XSpmService {
         ]
     }
 
+    @before(Before.prototype.checkWhite)
+    @exp()
     async errorLogSelect() {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
         let filter = {
@@ -530,6 +537,7 @@ export default class SpmService extends XSpmService {
         ]
     }
 
+    @exp()
     async assistNickSelect() {
         let {type, nick, activityId} = this.data, trulyType = "assistAll";
         let title = this.addAssistUserNickSelect().find(v => v.value === type)?.title;
@@ -623,6 +631,8 @@ export default class SpmService extends XSpmService {
         }
     }
 
+    @before(Before.prototype.checkWhite)
+    @exp()
     async commonReissue() {
         let {type, nick} = this.data;
         let dao = new BaseDao<any>(this.context);
@@ -674,6 +684,8 @@ export default class SpmService extends XSpmService {
         }
     }
 
+    @before(Before.prototype.checkWhite)
+    @exp()
     async myNickExport() {
         let {exportIndex, startTime, endTime, type, activityId, exportSize, sort, filter} = this.data;
         exportIndex = exportIndex || 0;
@@ -755,6 +767,8 @@ export default class SpmService extends XSpmService {
         }
     }
 
+    @before(Before.prototype.checkWhite)
+    @exp()
     async allUserNickExport() {
         let {exportIndex, startTime, endTime, activityId, exportSize} = this.data;
         exportIndex = exportIndex || 0;
@@ -813,6 +827,8 @@ export default class SpmService extends XSpmService {
         }
     }
 
+    @before(Before.prototype.checkWhite)
+    @exp()
     async userReissue() {
         let {activityId, nick, num, field, title} = this.data;
         if (!nick || !num) {
@@ -865,6 +881,8 @@ export default class SpmService extends XSpmService {
         this.response.message = `补发成功，影响了${line}条数据`;
     }
 
+    @before(Before.prototype.checkWhite)
+    @exp()
     async myWinnerExport() {
         let {type, exportIndex, winnerTitleAndTypeArr, sort, filter, startTime, endTime, size} = this.data;
         let match = {
@@ -912,4 +930,57 @@ export default class SpmService extends XSpmService {
             outUrl: url
         }
     }
+
+    @before(
+        Before.prototype.whiteList,
+        Before.prototype.globalActivity
+    )
+    @exp()
+    async selectUiTitleAndType() {
+        this.response.data = this.baseData;
+        this.response.data.isWhite = this.app.isWhite;
+    }
+
+    @exp({tb: "string"})
+    async createTb() {
+        let {ok, tb} = this.data;
+        if (ok === true) {
+            this.response.data = await this.context.cloud.db.createCollection(tb)
+        }
+    }
+
+    @exp({tb: "string", pipe: "array"})
+    async select(): Promise<any> {
+        let {pipe, tb} = this.data;
+        this.response.data = await this.app.db(tb).aggregate(pipe);
+    }
+
+    @exp({tb: "string", filter: "object", options: "object"})
+    async update() {
+        let {ok, tb, filter, options} = this.data;
+        if (ok === true) {
+            this.response.data = await this.app.db(tb).updateMany(filter, options);
+        }
+    }
+
+    @exp({tb: "string"})
+    async clean() {
+        let {tb, ok} = this.data;
+        if (ok === true) {
+            this.response.data = await this.app.db(tb).deleteMany({
+                _id: {
+                    $ne: 0
+                }
+            });
+        }
+    }
+
+    @exp({tb: "string", data: "array"})
+    async insert() {
+        let {ok, tb, data} = this.data;
+        if (ok === true) {
+            this.response.data = await this.app.db(tb).insertMany(data);
+        }
+    }
+
 }

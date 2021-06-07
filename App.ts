@@ -10,7 +10,7 @@ export default class App extends XApp {
     isWhite: boolean = false;
 }
 
-class Before extends XBefore {
+export class Before extends XBefore {
     whiteList() {
         this.addBefore = async (app: App) => {
             let isWhite = await app.db("whiteList").count({

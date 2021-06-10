@@ -21,9 +21,9 @@ export default class SpmService extends XSpmService {
     get baseData() {
         let {spmFun} = this;
         this.spmConfig = [
-            {title: "PV", type: "view", fun: spmFun.A},
-            {title: "UV", type: "view", fun: spmFun.A},
-            {title: "newUV", type: "view", fun: spmFun.A},
+            {title: "PV", type: "PV", fun: spmFun.A},
+            {title: "UV", type: "PV", fun: spmFun.A},
+            {title: "newUV", type: "PV", fun: spmFun.A},
         ];
         this.prizeConfig = [
             {title: "ID", type: v4(), targetField: "nick"},
@@ -226,11 +226,12 @@ export default class SpmService extends XSpmService {
     }
 
     addUserNickExport(title, {
-        parameter = {},
+        parameter = {} as any,
         options = [],
         fun = "",
         showTime = true
     } = {}) {
+        parameter.options = options;
         this.userNicksExportsArr.push({
             title: title,
             export: {
@@ -258,11 +259,12 @@ export default class SpmService extends XSpmService {
     }
 
     addUserNickSelect(title, {
-        parameter = {},
+        parameter = {} as any,
         options = [],
         fun = <"defaultNickSelect" | "assistNickSelect" | "errorLogSelect" | string>"",
         showTime = true
     } = {}) {
+        parameter.options = options;
         this.behaviorTitleAndTypeArr.push({
                 "title": title,
                 "export": {
@@ -446,8 +448,8 @@ export default class SpmService extends XSpmService {
     @before(Before.prototype.globalActivity)
     @exp()
     async defaultNickSelect({customExtMatch = <any>{}, customTitle = ""} = {}) {
-        let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
-        let title: string = customTitle || this.baseData.statisticsTitleAndTypeArr.find(v1 => v1.parameter.type === type)?.title?.replace(/(次数)|(人数)/g, "");
+        let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort, options} = this.data;
+        let title: string = customTitle || options.find(v => v.value === type)?.title?.replace(/(次数)|(人数)/g, "") || "未知埋点";
         let filter = {
             activityId,
             type,

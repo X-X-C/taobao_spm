@@ -1,8 +1,9 @@
 // @ts-ignore
 import * as gmspm from "gm-spm";
-import SpmService from "./src/SpmService";
 import App from "./App";
 import {XApp} from "./base/App";
+// @ts-ignore
+XApp.initExpose(App, exports);
 
 export async function spm(context) {
     return await gmspm.spm.spm(context);
@@ -43,7 +44,3 @@ export async function exportsNick(context) {
 export async function selectBehavior(context) {
     return await gmspm.spm.selectBehavior(context);
 }
-
-const modules = [SpmService];
-// @ts-ignore
-XApp.initExpose(App, exports);

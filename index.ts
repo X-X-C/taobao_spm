@@ -44,5 +44,5 @@ export async function selectBehavior(context) {
     return await gmspm.spm.selectBehavior(context);
 }
 
-[SpmService];
-exports = XApp.initExpose(App);
+const modules = [SpmService];
+XApp.initExpose(App, exports);

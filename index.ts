@@ -45,4 +45,5 @@ export async function selectBehavior(context) {
 }
 
 const modules = [SpmService];
+// @ts-ignore
 XApp.initExpose(App, exports);

@@ -3,7 +3,7 @@ import * as gmspm from "gm-spm";
 import App from "./App";
 import {XApp} from "./base/App";
 // @ts-ignore
-XApp.initExpose(App, exports);
+XApp.initExpose(App, exports, "src");
 
 export async function spm(context) {
     return await gmspm.spm.spm(context);

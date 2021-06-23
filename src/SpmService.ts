@@ -58,7 +58,7 @@ export default class SpmService extends XSpmService {
         });
 
         // this.addUserNickExport("所有用户ID导出", {
-        //     parameter: [
+        //     options: [
         //         this.generateOptions("用户ID", "")
         //     ],
         //     fun: "allUserNickExport"

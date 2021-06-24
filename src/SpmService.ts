@@ -7,7 +7,8 @@ import XErrorLogService from "../base/service/XErrorLogService";
 import XMsgGenerate from "../base/utils/XMsgGenerate";
 import BaseEntity from "../base/entity/abstract/BaseEntity";
 import {before, exp} from "../base/utils/Annotation";
-import App, {Before} from "../App";
+import {Before} from "./config/Before";
+import App from "../App";
 
 const {uuid: {v4}, formatNum} = Utils;
 
@@ -865,15 +866,17 @@ export default class SpmService extends XSpmService {
             }
         });
         if (line > 0) {
-            await this.simpleSpm("_" + field, {
-                desc: XMsgGenerate.baseInfo(user.nick, "补发" + title, title + formatNum(num), "剩余" + title + (user.getValueFromKey(field) + num)),
-                line,
-                reissue: true
-            }, {
-                openId: user.openId,
-                nick: user.nick,
-                mixNick: user.mixNick
-            });
+            this.simpleSpm("_" + field)
+                .extData({
+                    desc: XMsgGenerate.baseInfo(user.nick, "补发" + title, title + formatNum(num), "剩余" + title + (user.getValueFromKey(field) + num)),
+                    line,
+                    reissue: true
+                })
+                .cover({
+                    openId: user.openId,
+                    nick: user.nick,
+                    mixNick: user.mixNick
+                })
             if (line !== 1) {
                 await this.getService(XErrorLogService).add({
                     message: `补发影响行数超过一条，请检查。实际补发行数${line}行`

@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as gmspm from "gm-spm";
-import App from "./App";
 import {XApp} from "./base/App";
+import App from "./App";
 // @ts-ignore
 XApp.initExpose(App, exports, "src");
 

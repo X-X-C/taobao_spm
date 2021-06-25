@@ -665,21 +665,21 @@ export default class SpmService extends XSpmService {
                 r = await topService.opentradeSpecialUsersMark({
                     skuId,
                     itemId
-                })
+                }).opentradeSpecialUsersMarkInvoke();
                 break;
             case "benefit":
                 let {ename} = this.data;
                 r = await topService.sendBenefit({
                     ename,
                     receiverOpenId: user.openId
-                });
+                }).sendBenefitInvoke();
                 break;
             case "point":
                 let {point} = this.data;
                 r = await topService.taobaoCrmPointChange({
                     num: Number(point),
                     openId: user.openId
-                });
+                }).taobaoCrmPointChangeInvoke();
                 break
         }
         if (r.code !== 1) {

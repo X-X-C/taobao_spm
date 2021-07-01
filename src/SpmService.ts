@@ -395,7 +395,8 @@ export default class SpmService extends XSpmService {
         this.addReissueConfig("积分补发", {
             fun: "commonReissue",
             fixParameter: {
-                reissueType: "point"
+                reissueType: "point",
+                showTitle: "积分补发"
             },
             parameter: [
                 {key: "nick", title: "用户昵称"},
@@ -408,7 +409,8 @@ export default class SpmService extends XSpmService {
         this.addReissueConfig("权益补发", {
             fun: "commonReissue",
             fixParameter: {
-                reissueType: "benefit"
+                reissueType: "benefit",
+                showTitle: "权益补发"
             },
             parameter: [
                 {key: "nick", title: "用户昵称"},
@@ -421,7 +423,8 @@ export default class SpmService extends XSpmService {
         this.addReissueConfig("打标补发", {
             fun: "commonReissue",
             fixParameter: {
-                reissueType: "mark"
+                reissueType: "mark",
+                showTitle: "打标补发"
             },
             parameter: [
                 {key: "nick", title: "用户昵称"},
@@ -637,7 +640,7 @@ export default class SpmService extends XSpmService {
     @before(Before.prototype.checkWhite)
     @exp()
     async commonReissue() {
-        let {type, nick} = this.data;
+        let {reissueType, nick, showTitle} = this.data;
         let dao = new BaseDao<any>(this.context);
         dao.initTb("users");
         let user: any = await dao.aggregate([
@@ -659,7 +662,7 @@ export default class SpmService extends XSpmService {
         }
         let topService = this.getService(TopService);
         let r;
-        switch (type) {
+        switch (reissueType) {
             case "mark":
                 let {itemId, skuId} = this.data;
                 r = await topService.opentradeSpecialUsersMark({
@@ -685,6 +688,14 @@ export default class SpmService extends XSpmService {
         if (r.code !== 1) {
             this.response.message = Utils.toJson(r.data);
         }
+        await this.simpleSpm("_reissue").extData({
+            reissueResult: r,
+            desc: XMsgGenerate.baseInfo(nick, `补发：${showTitle}`, this.response.message, Utils.toJson(r.data))
+        }).cover({
+            openId: user.openId,
+            nick: user.nick,
+            mixNick: user.mixNick
+        });
     }
 
     @before(Before.prototype.checkWhite)

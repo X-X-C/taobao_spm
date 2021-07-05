@@ -10,14 +10,12 @@ import {before, exp} from "../base/utils/Annotation";
 import {Before} from "./config/Before";
 import App from "../App";
 
-const {uuid: {v4}, formatNum} = Utils;
+const {uuid: {v4}, formatNum, isBlank, cleanObj} = Utils;
 
-export default class SpmService extends XSpmService {
+export default class SpmService extends XSpmService<App> {
     constructor(app: App) {
         super(app)
     }
-
-    app: App;
 
     get baseData() {
         let {spmFun} = this;
@@ -465,7 +463,7 @@ export default class SpmService extends XSpmService {
             ...extMatch,
             ...customExtMatch
         }
-        if (nick && Object.entries(customExtMatch).length === 0) {
+        if (nick && isBlank(customExtMatch)) {
             let userService = this.getService(BaseService);
             userService.dao.initTb("users");
             let user = await userService.get({
@@ -477,7 +475,7 @@ export default class SpmService extends XSpmService {
                 filter.openId = user.openId;
             }
         }
-        Utils.cleanObj(filter);
+        cleanObj(filter);
         if (type === "PV") {
             this.dao.initTb("spm_pv");
         }

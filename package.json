@@ -4,7 +4,10 @@
     "description": "-",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "doc": "apidoc -i ./ -o ../doc/spm -f src/.*.ts",
+        "docm": "apidoc-markdown -p ../doc/spm  -o ../doc/spm/doc.md -t doc/template.md",
+        "docr": "apidoc-markdown -p ../doc/spm  -o ../doc/spm/run.md -t doc/run.md"
     },
     "sdkVersion": "*",
     "dependencies": {

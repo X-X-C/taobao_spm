@@ -39,7 +39,11 @@ export default class SpmService extends XSpmService<App> {
             // this.generateOptions("排行榜", "rank"),
             // this.generateOptions("抽奖", "lottery"),
         ]
-        this.prizeParameter = {}
+        this.prizeParameter = {
+            sort: {
+                time: -1
+            }
+        }
         this.exportStatistics = <exportStatistics>{};
         this.addWinnerExport("中奖数据");
         this.addAllSpmUserNickExport();

@@ -509,7 +509,6 @@ export default class SpmService extends XSpmService<App> {
         ]
     }
 
-    @before(Before.prototype.checkWhite)
     @exp()
     async errorLogSelect() {
         let {activityId, type, nick, startTime, endTime, page, size, extMatch, sort} = this.data;
@@ -639,7 +638,6 @@ export default class SpmService extends XSpmService<App> {
         }
     }
 
-    @before(Before.prototype.checkWhite)
     @exp()
     async commonReissue() {
         let {reissueType, nick, showTitle} = this.data;
@@ -700,7 +698,7 @@ export default class SpmService extends XSpmService<App> {
         });
     }
 
-    @before(Before.prototype.checkWhite)
+
     @exp()
     async myNickExport() {
         let {exportIndex, startTime, endTime, type, activityId, exportSize, sort, filter} = this.data;
@@ -783,7 +781,7 @@ export default class SpmService extends XSpmService<App> {
         }
     }
 
-    @before(Before.prototype.checkWhite)
+
     @exp()
     async allUserNickExport() {
         let {exportIndex, startTime, endTime, activityId, exportSize} = this.data;
@@ -843,7 +841,7 @@ export default class SpmService extends XSpmService<App> {
         }
     }
 
-    @before(Before.prototype.checkWhite)
+
     @exp()
     async userReissue() {
         let {activityId, nick, num, field, title} = this.data;
@@ -899,7 +897,7 @@ export default class SpmService extends XSpmService<App> {
         this.response.message = `补发成功，影响了${line}条数据`;
     }
 
-    @before(Before.prototype.checkWhite)
+
     @exp()
     async myWinnerExport() {
         let {type, exportIndex, winnerTitleAndTypeArr, sort, filter, startTime, endTime, size} = this.data;
@@ -950,13 +948,11 @@ export default class SpmService extends XSpmService<App> {
     }
 
     @before(
-        Before.prototype.whiteList,
         Before.prototype.globalActivity
     )
     @exp()
     async selectUiTitleAndType() {
         this.response.data = this.baseData;
-        this.response.data.isWhite = this.app.isWhite;
     }
 
     @exp({tb: "string"})
